@@ -1,10 +1,11 @@
 package com.exe201.beana.filter;
 
 import jakarta.servlet.*;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.logging.Logger;
-
+@Component
 public class AuthoritiesLoggingAtFilter implements Filter {
     private final Logger LOG =
             Logger.getLogger(AuthoritiesLoggingAtFilter.class.getName());

@@ -2,6 +2,7 @@ package com.exe201.beana.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +18,10 @@ public class ProductRequestDto {
     @NotBlank(message = "The property is not null or whitespace")
     private String name;
 
-    @NotEmpty(message = "Quantity is required")
-    @NotBlank(message = "The property is not null or whitespace")
+    @NotNull(message = "Quantity is required")
     private int quantity;
 
-    @NotEmpty(message = "Price is required")
-    @NotBlank(message = "The property is not null or whitespace")
+    @NotNull(message = "Price is required")
     private double price;
 
     private String description;
@@ -31,20 +30,17 @@ public class ProductRequestDto {
 
     private String ingredients;
 
-    @NotEmpty(message = "Skin is required")
-    @NotBlank(message = "The property is not null or whitespace")
+    @NotNull(message = "skinIds not found")
     private Long[] skinIds;
 
-    @NotEmpty(message = "Reputation is required")
-    @NotBlank(message = "The property is not null or whitespace")
+    @NotNull(message = "reputationId not found")
     private Long reputationId;
 
     private String specification;
 
-    private String preservation;
+    private String certification;
 
-    @NotEmpty(message = "ChildCategoryId is required")
-    @NotBlank(message = "The property is not null or whitespace")
+    @NotNull(message = "childCategoryId not found")
     private Long childCategoryId;
 
     private Long[] productImageIds;

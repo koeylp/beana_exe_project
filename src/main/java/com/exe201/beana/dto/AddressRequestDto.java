@@ -15,9 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AddressDto {
-    private Long id;
-
+public class AddressRequestDto {
     @NotEmpty(message = "FullName is required")
     @NotBlank(message = "The property is not null or whitespace")
     private String fullName;
@@ -43,13 +41,6 @@ public class AddressDto {
     @NotBlank(message = "The property is not null or whitespace")
     private String address;
 
-    private Date timeCreated;
-
-    private Date updatedDatetime;
-
-    @NotNull(message = "Status is required")
-    private byte status;
-
-    @NotNull(message = "user is required")
-    private UserDto user;
+    @NotNull(message = "userId is required")
+    private Long userId;
 }

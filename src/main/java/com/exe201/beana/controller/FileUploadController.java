@@ -1,6 +1,8 @@
 package com.exe201.beana.controller;
 
-import com.exe201.beana.service.FileUpload;
+import com.exe201.beana.service.FileUploadService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -17,13 +19,12 @@ import java.io.IOException;
 @RequestMapping("/api/v1")
 public class FileUploadController {
 
-    private final FileUpload fileUpload;
+    private final FileUploadService fileUploadService;
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("image") MultipartFile multipartFile,
-                                             Model model) throws IOException {
-        String imageURL = fileUpload.uploadFile(multipartFile);
-        model.addAttribute("imageURL", imageURL);
+                                             HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String imageURL = fileUploadService.uploadFile(multipartFile, request, response);
         return ResponseEntity.ok("Uploaded photo: " + imageURL);
     }
 }

@@ -1,10 +1,13 @@
 package com.exe201.beana.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.util.Date;
 
@@ -12,14 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserDto {
-
-    private Long id;
-
-    @NotEmpty(message = "Email is required")
-    @Email(message = "Wrong email's format")
-    @NotBlank(message = "The property is not null or whitespace")
-    private String email;
+public class RegisterRequestDto {
 
     @NotEmpty(message = "Username is required")
     @NotBlank(message = "The property is not null or whitespace")
@@ -29,25 +25,24 @@ public class UserDto {
     @NotBlank(message = "The property is not null or whitespace")
     private String name;
 
+    @NotEmpty(message = "Email is required")
+    @Email(message = "Wrong email's format")
+    @NotBlank(message = "The property is not null or whitespace")
+    private String email;
+
     @Pattern(regexp = "(^$|[0-9]{10})", message = "Phone must be only number and including 10 numbers")
     @NotEmpty(message = "Phone is required")
     @NotBlank(message = "The property is not null or whitespace")
     private String phone;
 
+    @NotNull(message = "gender is required")
     private int gender;
 
-    @NotNull(message = "Birthday is required")
+//    @NotEmpty(message = "Birthday is required")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date dob;
 
-    @NotEmpty(message = "Role is required")
+    @NotEmpty(message = "Password is required")
     @NotBlank(message = "The property is not null or whitespace")
-    private String role;
-
-    private String avatar;
-
-    private Date timeCreated;
-
-    private Date updatedDatetime;
-
-    private byte status;
+    private String password;
 }

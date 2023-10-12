@@ -1,6 +1,5 @@
 package com.exe201.beana.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -9,29 +8,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class OrderDto {
+public class ItemDto {
     private Long id;
 
-    @NotEmpty(message = "Order's date is required")
+    @NotEmpty(message = "name is required")
     @NotBlank(message = "The property is not null or whitespace")
-    private String orderDate;
+    private String name;
 
-    @NotNull(message = "Amount is required")
-    private double amount;
+    @NotNull(message = "quantity is required")
+    private int quantity;
 
-    private byte status;
+    @NotNull(message = "price is required")
+    private double price;
 
-    private UserDto user;
+    @NotNull(message = "cartQuantity is required")
+    private int cartQuantity;
 
-    private AddressDto address;
-
-    private PaymentDto payment;
-
-    private List<OrderDetailsDto> orderDetailsList;
 }

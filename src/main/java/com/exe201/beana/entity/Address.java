@@ -2,10 +2,7 @@ package com.exe201.beana.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -18,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "Addresses")
+@Builder
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,7 +48,7 @@ public class Address {
     private Date updatedDatetime;
 
     @Column(name = "status", nullable = false)
-    private String status;
+    private byte status;
 
     @ManyToOne
     @JoinColumn(name = "userId")

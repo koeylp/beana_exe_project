@@ -9,8 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ProductImageDto {
-    private Long id;
-    private String url;
-    private byte status;
+public class AuthenticationRequestDto {
+    private String username;
+    private String password;
 }

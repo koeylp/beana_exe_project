@@ -46,6 +46,9 @@ public class Product {
     @Column(name = "specification")
     private String specification;
 
+    @Column(name = "certification")
+    private String certification;
+
     @Column(name = "soldQuantity")
     private int soldQuantity;
 

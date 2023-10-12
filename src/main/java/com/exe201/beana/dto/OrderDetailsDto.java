@@ -1,7 +1,7 @@
 package com.exe201.beana.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,21 +17,17 @@ public class OrderDetailsDto {
 
     private Long id;
 
-    @NotEmpty(message = "Quantity is required")
-    @NotBlank(message = "The property is not null or whitespace")
+    @NotNull(message = "quantity is required")
     private int quantity;
 
     private Date timeCreated;
 
-    private Date updatedDatetime;
-
-    @NotEmpty(message = "Status is required")
-    @NotBlank(message = "The property is not null or whitespace")
+    @NotNull(message = "Status is required")
     private byte status;
 
-    @NotEmpty(message = "OrderId is required")
-    private OrderDto order;
+    @JsonIgnore
+    private OrderDto orderDto;
 
-    @NotEmpty(message = "ProductId is required")
+    @NotNull(message = "ProductId is required")
     private ProductDto product;
 }

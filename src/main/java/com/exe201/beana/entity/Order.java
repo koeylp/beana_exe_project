@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 import java.util.List;
@@ -29,14 +28,6 @@ public class Order {
 
     @Column(name = "amount", nullable = false)
     private double amount;
-
-    @Column(name = "timeCreated", nullable = false)
-    @CreationTimestamp
-    private Date timeCreated;
-
-    @Column(name = "updated_datetime")
-    @UpdateTimestamp
-    private Date updatedDatetime;
 
     @Column(name = "status", nullable = false)
     private byte status;

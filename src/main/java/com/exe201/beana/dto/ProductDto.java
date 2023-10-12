@@ -40,6 +40,8 @@ public class ProductDto {
 
     private String specification;
 
+    private String certification;
+
     private int soldQuantity;
 
     private float rate;

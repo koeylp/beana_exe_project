@@ -5,6 +5,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -13,10 +14,11 @@ import java.util.Base64;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+@Component
 public class RequestValidationBeforeFilter implements Filter {
 
     public static final String AUTHENTICATION_SCHEME_BASIC = "Basic";
-    private Charset credentialsCharset = StandardCharsets.UTF_8;
+    private final Charset credentialsCharset = StandardCharsets.UTF_8;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -35,8 +37,8 @@ public class RequestValidationBeforeFilter implements Filter {
                     if (delim == -1) {
                         throw new BadCredentialsException("Invalid basic authentication token");
                     }
-                    String email = token.substring(0, delim);
-                    if (email.toLowerCase().contains("test")) {
+                    String username = token.substring(0, delim);
+                    if (username.toLowerCase().contains("test")) {
                         res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         return;
                     }

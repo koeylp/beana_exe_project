@@ -28,10 +28,6 @@ public class OrderDetails {
     @CreationTimestamp
     private Date timeCreated;
 
-    @Column(name = "updated_datetime")
-    @UpdateTimestamp
-    private Date updatedDatetime;
-
     @Column(name = "status", nullable = false)
     private byte status;
 
