@@ -6,7 +6,7 @@ import com.exe201.beana.dto.RegisterRequestDto;
 import com.exe201.beana.dto.UserDto;
 import com.exe201.beana.entity.Role;
 import com.exe201.beana.entity.User;
-import com.exe201.beana.exception.ResourceNameAlreadyExistsException;
+import com.exe201.beana.exception.ResourceAlreadyExistsException;
 import com.exe201.beana.mapper.UserMapper;
 import com.exe201.beana.repository.UserRepository;
 import com.exe201.beana.service.AuthService;
@@ -31,15 +31,15 @@ public class AuthServiceImpl implements AuthService {
     public UserDto register(RegisterRequestDto request) {
         Optional<User> foundUsername = userRepository.findUserByStatusAndUsername((byte) 1, request.getUsername());
         if (foundUsername.isPresent())
-            throw new ResourceNameAlreadyExistsException("Username already exists with user's id: " + foundUsername.get().getId());
+            throw new ResourceAlreadyExistsException("Username already exists with user's id: " + foundUsername.get().getId());
 
         Optional<User> foundEmail = userRepository.findUserByStatusAndEmail((byte) 1, request.getEmail());
         if (foundEmail.isPresent())
-            throw new ResourceNameAlreadyExistsException("Email already exists with user's id: " + foundEmail.get().getId());
+            throw new ResourceAlreadyExistsException("Email already exists with user's id: " + foundEmail.get().getId());
 
         Optional<User> foundPhone = userRepository.findUserByStatusAndPhone((byte) 1, request.getPhone());
         if (foundPhone.isPresent())
-            throw new ResourceNameAlreadyExistsException("Phone already exists with user's id: " + foundPhone.get().getId());
+            throw new ResourceAlreadyExistsException("Phone already exists with user's id: " + foundPhone.get().getId());
 
         var user = User.builder()
                 .username(request.getUsername())

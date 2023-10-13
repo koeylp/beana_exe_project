@@ -4,6 +4,7 @@ import com.exe201.beana.dto.ProductDto;
 import com.exe201.beana.dto.ProductRequestDto;
 import com.exe201.beana.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,8 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("")
-    public ResponseEntity<ProductDto> addProduct(@RequestBody @Valid ProductRequestDto productRequest, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.addProduct(productRequest, request));
+    public ResponseEntity<ProductDto> addProduct(@RequestBody @Valid ProductRequestDto productRequest, HttpServletRequest request, HttpServletResponse response) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.addProduct(productRequest, request, response));
     }
 
     @GetMapping("")

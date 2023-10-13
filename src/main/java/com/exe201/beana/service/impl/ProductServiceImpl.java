@@ -1,10 +1,11 @@
 package com.exe201.beana.service.impl;
 
+import com.exe201.beana.dto.CartDto;
 import com.exe201.beana.dto.ProductDto;
 import com.exe201.beana.dto.ProductImageListDto;
 import com.exe201.beana.dto.ProductRequestDto;
 import com.exe201.beana.entity.*;
-import com.exe201.beana.exception.ResourceNameAlreadyExistsException;
+import com.exe201.beana.exception.ResourceAlreadyExistsException;
 import com.exe201.beana.exception.ResourceNotFoundException;
 import com.exe201.beana.mapper.ProductMapper;
 import com.exe201.beana.repository.*;
@@ -13,10 +14,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,10 +37,10 @@ public class ProductServiceImpl implements ProductService {
     private static final String IMAGE_COOKIE_NAME = "IMAGE_COOKIE";
 
     @Override
-    public ProductDto addProduct(ProductRequestDto productRequest, HttpServletRequest request) {
+    public ProductDto addProduct(ProductRequestDto productRequest, HttpServletRequest request, HttpServletResponse response) {
         Optional<Product> foundProduct = productRepository.findProductByStatusAndName((byte) 1, productRequest.getName());
         if (foundProduct.isPresent())
-            throw new ResourceNameAlreadyExistsException("Product exists with id: " + foundProduct.get().getId());
+            throw new ResourceAlreadyExistsException("Product exists with id: " + foundProduct.get().getId());
 
         Optional<ChildCategory> foundChildCategory = childCategoryRepository.findChildCategoryByStatusAndId((byte) 1, productRequest.getChildCategoryId());
         if (foundChildCategory.isEmpty())
@@ -47,6 +50,9 @@ public class ProductServiceImpl implements ProductService {
         if (foundReputation.isEmpty())
             throw new ResourceNotFoundException("Reputation does not exist with id: " + productRequest.getReputationId());
 
+        ProductImageListDto productImageList = getImageFromCookie(request);
+        if (productImageList.getProductImageList() == null || productImageList.getProductImageList().isEmpty())
+            throw new ResourceNotFoundException("Upload Images first!");
 
         Product newProduct = getProduct(productRequest, foundChildCategory, foundReputation);
         productRepository.save(newProduct);
@@ -70,13 +76,15 @@ public class ProductServiceImpl implements ProductService {
         productSkinRepository.saveAll(productSkinList);
         newProduct.setProductSkins(productSkinList);
         // image....
-        ProductImageListDto productImageList = getImageFromCookie(request);
+
         newProduct.setProductImageList(productImageList.getProductImageList());
 
         for (ProductImage productImage : productImageList.getProductImageList()) {
             productImage.setProduct(newProduct);
             productImageRepository.save(productImage);
         }
+        productImageList.getProductImageList().clear();
+        saveImageToCookie(productImageList, response);
 
         return ProductMapper.INSTANCE.toProductDto(productRepository.save(newProduct));
     }
@@ -103,6 +111,32 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    private void saveImageToCookie(ProductImageListDto imageUrls, HttpServletResponse response) {
+        Cookie imageCookie = new Cookie(IMAGE_COOKIE_NAME, serializeImageList(imageUrls));
+        imageCookie.setMaxAge(24 * 60 * 60);
+        response.addCookie(imageCookie);
+    }
+
+    private String serializeImageList(ProductImageListDto imageUrls) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return URLEncoder.encode(objectMapper.writeValueAsString(imageUrls), StandardCharsets.UTF_8);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+//    private void clearCookie(HttpServletRequest request) {
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies != null) {
+//            for (Cookie cookie : cookies) {
+//                if (cookie.getName().equals(IMAGE_COOKIE_NAME)) {
+//                    cookie.setMaxAge(0);
+//                }
+//            }
+//        }
+//    }
+
     private static Product getProduct(ProductRequestDto productRequest, Optional<ChildCategory> foundChildCategory, Optional<Reputation> foundReputation) {
         Product newProduct = new Product();
         newProduct.setName(productRequest.getName());
@@ -114,6 +148,7 @@ public class ProductServiceImpl implements ProductService {
         newProduct.setSpecification(productRequest.getSpecification());
         newProduct.setSoldQuantity(0);
         newProduct.setStatus((byte) 1);
+        newProduct.setCertification(productRequest.getCertification());
         newProduct.setChildCategory(foundChildCategory.get());
         newProduct.setReputation(foundReputation.get());
         newProduct.setHowToUse(productRequest.getHowToUse());

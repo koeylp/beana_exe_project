@@ -33,20 +33,23 @@ public class Product {
     private double price;
 
     @Lob
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "MEDIUMTEXT")
     private String description;
 
     @Lob
-    @Column(name = "mainFunction")
+    @Column(name = "mainFunction", columnDefinition = "MEDIUMTEXT")
     private String mainFunction;
 
-    @Column(name = "ingredients")
+    @Column(name = "ingredients", columnDefinition = "MEDIUMTEXT")
+    @Lob
     private String ingredients;
 
-    @Column(name = "specification")
+    @Column(name = "specification", columnDefinition = "MEDIUMTEXT")
+    @Lob
     private String specification;
 
-    @Column(name = "certification")
+    @Column(name = "certification", columnDefinition = "MEDIUMTEXT")
+    @Lob
     private String certification;
 
     @Column(name = "soldQuantity")
@@ -56,7 +59,7 @@ public class Product {
     private float rate;
 
     @Lob
-    @Column(name = "howToUse")
+    @Column(name = "howToUse", columnDefinition = "MEDIUMTEXT")
     private String howToUse;
 
     @Column(name = "status", nullable = false)

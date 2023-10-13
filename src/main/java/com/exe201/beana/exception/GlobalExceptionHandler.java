@@ -20,8 +20,8 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(ResourceNameAlreadyExistsException.class)
-    public ResponseEntity<ErrorDetails> handleResourceNameAlreadyExistsException(ResourceNameAlreadyExistsException exception, WebRequest webRequest) {
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ErrorDetails> handleResourceNameAlreadyExistsException(ResourceAlreadyExistsException exception, WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails(
                 LocalDateTime.now(),
                 exception.getMessage(),

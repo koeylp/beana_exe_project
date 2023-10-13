@@ -3,7 +3,7 @@ package com.exe201.beana.service.impl;
 import com.exe201.beana.dto.CategoryDto;
 import com.exe201.beana.dto.CategoryRequestDto;
 import com.exe201.beana.entity.Category;
-import com.exe201.beana.exception.ResourceNameAlreadyExistsException;
+import com.exe201.beana.exception.ResourceAlreadyExistsException;
 import com.exe201.beana.mapper.CategoryMapper;
 import com.exe201.beana.repository.CategoryRepository;
 import com.exe201.beana.service.CategoryService;
@@ -29,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto addCategory(CategoryRequestDto newCategory) {
         Optional<Category> foundCategory = categoryRepository.findCategoryByStatusAndName((byte) 1, newCategory.getName());
         if (foundCategory.isPresent()) {
-            throw new ResourceNameAlreadyExistsException("Category already exists with id: " + foundCategory.get().getId());
+            throw new ResourceAlreadyExistsException("Category already exists with id: " + foundCategory.get().getId());
         }
         CategoryDto newCategoryDto = new CategoryDto();
         newCategoryDto.setName(newCategory.getName());
@@ -42,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto getCategoryById(Long categoryId) {
         Optional<Category> foundCategory = categoryRepository.findCategoryByStatusAndId((byte) 1, categoryId);
         if (foundCategory.isEmpty()) {
-            throw new ResourceNameAlreadyExistsException("Can not find category with id: " + categoryId);
+            throw new ResourceAlreadyExistsException("Can not find category with id: " + categoryId);
         }
         return CategoryMapper.INSTANCE.toCategoryDto(foundCategory.get());
     }
@@ -51,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto editNameCategory(CategoryRequestDto categoryRequest, Long categoryId) {
         Optional<Category> foundCategory = categoryRepository.findCategoryByStatusAndId((byte) 1, categoryId);
         if (foundCategory.isEmpty())
-            throw new ResourceNameAlreadyExistsException("Can not find category with id: " + categoryId);
+            throw new ResourceAlreadyExistsException("Can not find category with id: " + categoryId);
         foundCategory.get().setName(categoryRequest.getName());
         return CategoryMapper.INSTANCE.toCategoryDto(categoryRepository.save(foundCategory.get()));
     }

@@ -54,7 +54,11 @@ public class SecurityConfig {
                         "/api/v1/upload",
                         "api/v1/payments",
                         "api/v1/addresses",
-                        "/api/v1/orders"
+                        "/api/v1/orders",
+                        "/api/v1/categories",
+                        "/api/v1/childcategories",
+                        "/api/v1/skins",
+                        "/api/v1/reputations"
                 ))
                 .authorizeHttpRequests((requests) -> requests
 //                        .requestMatchers("/api/v1/products")
