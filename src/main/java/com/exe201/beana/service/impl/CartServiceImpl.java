@@ -3,6 +3,7 @@ package com.exe201.beana.service.impl;
 import com.exe201.beana.dto.CartDto;
 import com.exe201.beana.dto.CartItemDto;
 import com.exe201.beana.dto.ItemDto;
+import com.exe201.beana.exception.ResourceNotFoundException;
 import com.exe201.beana.service.CartService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Objects;
 
 @Service
@@ -43,6 +45,10 @@ public class CartServiceImpl implements CartService {
     @Override
     public void removeItem(ItemDto item, HttpServletRequest request, HttpServletResponse response) {
         CartDto cart = getCart(request);
+        if (cart.getItems() == null)
+            throw new ResourceNotFoundException("Cart is null");
+        if (!cart.getItems().contains(item))
+            throw new ResourceNotFoundException("Item not found in cart");
         cart.removeItem(item);
         saveCartToCookie(cart, response);
     }
