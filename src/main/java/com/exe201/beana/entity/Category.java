@@ -1,5 +1,6 @@
 package com.exe201.beana.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -38,6 +39,6 @@ public class Category {
     private byte status;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
-    @JsonIgnore
+    @JsonBackReference
     private List<ChildCategory> childCategories;
 }

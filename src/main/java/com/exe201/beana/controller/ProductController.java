@@ -2,6 +2,7 @@ package com.exe201.beana.controller;
 
 import com.exe201.beana.dto.ProductDto;
 import com.exe201.beana.dto.ProductRequestDto;
+import com.exe201.beana.dto.ProductRequestFilterDto;
 import com.exe201.beana.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,5 +41,22 @@ public class ProductController {
     public ResponseEntity<ProductDto> editProduct(@RequestBody @Valid ProductRequestDto productRequest, @PathVariable Long productId) {
         return ResponseEntity.status(HttpStatus.OK).body(productService.editProduct(productRequest, productId));
     }
+
+    @GetMapping("/price/{startPrice}/{endPrice}")
+    public ResponseEntity<List<ProductDto>> getProductsByPriceRange(@PathVariable double startPrice, @PathVariable double endPrice) {
+        return ResponseEntity.ok(productService.getProductsByPriceRange(startPrice, endPrice));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<ProductDto>> filterProductList(@RequestParam(name = "sort-type", required = false, defaultValue = "") String sortType,
+                                                              @RequestParam(name = "category", required = false, defaultValue = "") String category,
+                                                              @RequestParam(name = "child-category", required = false, defaultValue = "") String child_category,
+                                                              @RequestParam(name = "skin", required = false, defaultValue = "") String skin,
+                                                              @RequestParam(name = "status", required = false) String status,
+                                                              @RequestParam(name = "start-price", required = false) String start_price,
+                                                              @RequestParam(name = "end-price", required = false) String end_price) {
+        return ResponseEntity.ok(productService.filterProductList(sortType, category, child_category, skin, status, start_price, end_price));
+    }
+
 
 }

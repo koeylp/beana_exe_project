@@ -30,6 +30,5 @@ public class CategoryDto {
     @NotBlank(message = "The property is not null or whitespace")
     private byte status;
 
-    @JsonProperty("childCategories")
-    private List<ChildCategoryDto> childCategoryDtos;
+    private List<ChildCategoryDto> childCategories;
 }

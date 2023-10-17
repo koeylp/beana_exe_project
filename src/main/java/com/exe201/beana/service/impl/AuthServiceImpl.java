@@ -6,12 +6,15 @@ import com.exe201.beana.dto.RegisterRequestDto;
 import com.exe201.beana.dto.UserDto;
 import com.exe201.beana.entity.Role;
 import com.exe201.beana.entity.User;
+import com.exe201.beana.exception.BadCredentialException;
 import com.exe201.beana.exception.ResourceAlreadyExistsException;
+import com.exe201.beana.exception.ResourceNotFoundException;
 import com.exe201.beana.mapper.UserMapper;
 import com.exe201.beana.repository.UserRepository;
 import com.exe201.beana.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,7 +43,6 @@ public class AuthServiceImpl implements AuthService {
         Optional<User> foundPhone = userRepository.findUserByStatusAndPhone((byte) 1, request.getPhone());
         if (foundPhone.isPresent())
             throw new ResourceAlreadyExistsException("Phone already exists with user's id: " + foundPhone.get().getId());
-
         var user = User.builder()
                 .username(request.getUsername())
                 .name(request.getName())
@@ -49,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
                 .phone(request.getPhone())
                 .dob(request.getDob())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.ROLE_CUSTOMER)
+                .role(request.isAdmin() ? Role.ROLE_MANAGER : Role.ROLE_CUSTOMER)
                 .status((byte) 1)
                 .build();
         return UserMapper.INSTANCE.toUserDto(userRepository.save(user));
@@ -57,18 +59,23 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponseDto authenticate(AuthenticationRequestDto request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
-        var user = userRepository.findUserByStatusAndUsername((byte) 1, request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponseDto.builder()
-                .token(jwtToken)
-                .build();
+        try {
+            Optional<User> foundUser = userRepository.findUserByStatusAndUsername((byte) 1, request.getUsername());
+            if (foundUser.isEmpty())
+                throw new ResourceNotFoundException("Wrong username");
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()
+                    )
+            );
+            var jwtToken = jwtService.generateToken(foundUser.get());
+            return AuthenticationResponseDto.builder()
+                    .token(jwtToken)
+                    .build();
+        } catch (Exception e) {
+            throw new BadCredentialException("Wrong username or password");
+        }
     }
 
 }

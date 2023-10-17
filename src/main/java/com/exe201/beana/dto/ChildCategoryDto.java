@@ -26,4 +26,5 @@ public class ChildCategoryDto {
 
     @NotEmpty(message = "Status is required")
     private byte status;
+
 }

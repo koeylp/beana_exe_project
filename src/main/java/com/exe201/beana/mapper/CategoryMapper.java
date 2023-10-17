@@ -10,7 +10,6 @@ import org.mapstruct.factory.Mappers;
 public interface CategoryMapper {
     CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
 
-    @Mapping(source = "childCategories", target = "childCategoryDtos")
     CategoryDto toCategoryDto(Category category);
 
     Category toCategory(CategoryDto categoryDto);

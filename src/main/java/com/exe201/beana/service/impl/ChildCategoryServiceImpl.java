@@ -12,7 +12,9 @@ import com.exe201.beana.service.ChildCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,5 +39,10 @@ public class ChildCategoryServiceImpl implements ChildCategoryService {
         temp.setCategory(foundCategory.get());
         ChildCategory addedChildCategory = childCategoryRepository.save(temp);
         return ChildCategoryMapper.INSTANCE.toChildCategoryDto(addedChildCategory);
+    }
+
+    @Override
+    public List<ChildCategoryDto> getAllChildCategories() {
+        return childCategoryRepository.findAll().stream().map(ChildCategoryMapper.INSTANCE::toChildCategoryDto).collect(Collectors.toList());
     }
 }

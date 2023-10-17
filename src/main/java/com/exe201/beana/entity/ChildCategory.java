@@ -1,6 +1,7 @@
 package com.exe201.beana.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,8 +39,6 @@ public class ChildCategory {
 
     @ManyToOne
     @JoinColumn(name = "categoryId")
-    @JsonIgnore
+    @JsonManagedReference
     private Category category;
-
-
 }

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Date;
 
@@ -38,11 +39,13 @@ public class RegisterRequestDto {
     @NotNull(message = "gender is required")
     private int gender;
 
-//    @NotEmpty(message = "Birthday is required")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date dob;
 
     @NotEmpty(message = "Password is required")
     @NotBlank(message = "The property is not null or whitespace")
     private String password;
+
+    @Value("false")
+    private boolean admin;
 }

@@ -8,6 +8,7 @@ import com.exe201.beana.mapper.CategoryMapper;
 import com.exe201.beana.repository.CategoryRepository;
 import com.exe201.beana.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +23,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDto> getAllCategories() {
+        List<Category> temp = categoryRepository.findAllByStatus((byte) 1);
+
         return categoryRepository.findAllByStatus((byte) 1).stream().map(CategoryMapper.INSTANCE::toCategoryDto).collect(Collectors.toList());
     }
 
@@ -44,6 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (foundCategory.isEmpty()) {
             throw new ResourceAlreadyExistsException("Can not find category with id: " + categoryId);
         }
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
         return CategoryMapper.INSTANCE.toCategoryDto(foundCategory.get());
     }
 
