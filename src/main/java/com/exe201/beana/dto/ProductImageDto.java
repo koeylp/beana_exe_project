@@ -13,4 +13,5 @@ public class ProductImageDto {
     private Long id;
     private String url;
     private byte status;
+    private int type;
 }
