@@ -29,4 +29,6 @@ public class ProductImage {
     @JoinColumn(name = "productId")
     @JsonIgnore
     private Product product;
+
+    private int type;
 }

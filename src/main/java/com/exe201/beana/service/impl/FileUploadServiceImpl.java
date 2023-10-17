@@ -32,14 +32,14 @@ public class FileUploadServiceImpl implements FileUploadService {
     private static final String IMAGE_COOKIE_NAME = "IMAGE_COOKIE";
 
     @Override
-    public String uploadFile(MultipartFile multipartFile, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public String uploadFile(MultipartFile multipartFile, int type, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String urlImage = cloudinary.uploader()
                 .upload(multipartFile.getBytes(),
                         Map.of("public_id", UUID.randomUUID().toString()))
                 .get("url")
                 .toString();
 
-        ProductImage productImage = productImageRepository.save(new ProductImage(null, urlImage, (byte) 1, null));
+        ProductImage productImage = productImageRepository.save(new ProductImage(null, urlImage, (byte) 1, null, type));
         ProductImageListDto productImageList = getImageFromCookie(request);
         productImageList.addItem(productImage);
         saveImageToCookie(productImageList, response);

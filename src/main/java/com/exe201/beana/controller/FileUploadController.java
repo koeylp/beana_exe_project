@@ -22,9 +22,9 @@ public class FileUploadController {
     private final FileUploadService fileUploadService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("image") MultipartFile multipartFile,
+    public ResponseEntity<String> uploadFile(@RequestParam("image") MultipartFile multipartFile, @RequestParam int type,
                                              HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String imageURL = fileUploadService.uploadFile(multipartFile, request, response);
+        String imageURL = fileUploadService.uploadFile(multipartFile, type, request, response);
         return ResponseEntity.ok("Uploaded photo: " + imageURL);
     }
 }
