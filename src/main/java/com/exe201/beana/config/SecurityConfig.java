@@ -45,8 +45,8 @@ public class SecurityConfig {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration config = new CorsConfiguration();
-//                        config.setAllowedOrigins(Collections.singletonList("http://localhost:5173"));
-                        config.setAllowedOriginPatterns(List.of("*"));
+                        config.setAllowedOrigins(Collections.singletonList("http://localhost:5173"));
+//                        config.setAllowedOriginPatterns(List.of("*"));
                         config.setAllowedMethods(Collections.singletonList("*"));
                         config.setAllowCredentials(true);
                         config.setAllowedHeaders(Collections.singletonList("*"));
@@ -97,7 +97,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "api/v1/payments").hasRole(ROLE_MANAGER)
                         .requestMatchers(HttpMethod.GET, "api/v1/payments").permitAll()
                         // cart
-                        .requestMatchers("api/v1/cart").permitAll()
+                        .requestMatchers("api/v1/cart/**").permitAll()
                         // order
                         .requestMatchers(HttpMethod.POST, "api/v1/orders").hasRole(ROLE_CUSTOMER)
                         .requestMatchers(HttpMethod.GET, "api/v1/orders/**").hasRole(ROLE_CUSTOMER)

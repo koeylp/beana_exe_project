@@ -26,6 +26,8 @@ public class CartServiceImpl implements CartService {
     @Override
     public void addItemToCart(ItemDto item, HttpServletRequest request, HttpServletResponse response) {
         CartDto cart = getCart(request);
+        if (cart == null)
+            cart = new CartDto();
         for (CartItemDto cartItem : cart.getItems()) {
             if (Objects.equals(cartItem.getItem().getId(), item.getId())) {
                 cartItem.setQuantity(cartItem.getQuantity() + item.getCartQuantity());
