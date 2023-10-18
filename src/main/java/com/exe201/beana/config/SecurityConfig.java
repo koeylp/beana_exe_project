@@ -38,8 +38,8 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-        requestHandler.setCsrfRequestAttributeName("_csrf");
+//        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+//        requestHandler.setCsrfRequestAttributeName("_csrf");
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
                     @Override
@@ -54,20 +54,6 @@ public class SecurityConfig {
                         return config;
                     }
                 }));
-//        http.csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers(
-//                        "/api/v1/auth/**"
-//                        "/api/v1/products",
-//                        "/api/v1/cart/add",
-//                        "api/v1/cart/remove",
-//                        "/api/v1/upload",
-//                        "api/v1/payments",
-//                        "api/v1/addresses",
-//                        "/api/v1/orders",
-//                        "/api/v1/categories",
-//                        "/api/v1/childcategories",
-//                        "/api/v1/skins",
-//                        "/api/v1/reputations"
-//                ))
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authenticationProvider(authenticationProvider)

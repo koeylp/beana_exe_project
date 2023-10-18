@@ -1,5 +1,6 @@
 package com.exe201.beana.filter;
 
+import com.exe201.beana.exception.ResourceNotFoundException;
 import com.mysql.cj.util.StringUtils;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;

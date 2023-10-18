@@ -39,6 +39,5 @@ public class ChildCategory {
 
     @ManyToOne
     @JoinColumn(name = "categoryId")
-    @JsonManagedReference
     private Category category;
 }

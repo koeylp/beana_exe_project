@@ -7,6 +7,7 @@ import com.exe201.beana.dto.ProductRequestFilterDto;
 import com.exe201.beana.entity.*;
 import com.exe201.beana.exception.ResourceAlreadyExistsException;
 import com.exe201.beana.exception.ResourceNotFoundException;
+import com.exe201.beana.mapper.ChildCategoryMapper;
 import com.exe201.beana.mapper.ProductMapper;
 import com.exe201.beana.repository.*;
 import com.exe201.beana.service.ProductService;
@@ -34,8 +35,8 @@ public class ProductServiceImpl implements ProductService {
     private final ReputationRepository reputationRepository;
     private final SkinRepository skinRepository;
     private final ProductImageRepository productImageRepository;
+    private final CategoryRepository categoryRepository;
     private static final String IMAGE_COOKIE_NAME = "IMAGE_COOKIE";
-    private static final String FILTER_PRODUCT_COOKIE = "FILTER_COOKIE";
 
 
     @Override
@@ -168,7 +169,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto editProduct(ProductRequestDto productRequest, Long productId) {
+    public ProductDto editProduct(ProductRequestDto productRequest, Long productId, HttpServletRequest request, HttpServletResponse response) {
         Optional<Product> foundProduct = productRepository.findProductByStatusAndId((byte) 1, productId);
         if (foundProduct.isEmpty())
             throw new ResourceNotFoundException("Product not found with id: " + productId);
@@ -209,6 +210,23 @@ public class ProductServiceImpl implements ProductService {
 //        foundProduct.get().setMainFunction(productRequest.getMainFunction());
 //        foundProduct.get().setHowToUse(productRequest.getHowToUse());
 //        foundProduct.get().setProductImageList();
+
+        // check image list already uploaded
+        ProductImageListDto productImageList = getImageFromCookie(request);
+
+        // get image uploaded from cookie and save to database
+        newProduct.setProductImageList(productImageList.getProductImageList());
+
+        for (ProductImage productImage : productImageList.getProductImageList()) {
+            productImage.setProduct(newProduct);
+            productImageRepository.save(productImage);
+        }
+
+        // clear images after done saving
+        productImageList.getProductImageList().clear();
+        saveImageToCookie(productImageList, response);
+
+
         return ProductMapper.INSTANCE.toProductDto(productRepository.save(foundProduct.get()));
     }
 
@@ -231,9 +249,6 @@ public class ProductServiceImpl implements ProductService {
          3 : "Giá từ cao đến thấp" */
 
 
-
-
-
         if (status == null)
             status = String.valueOf(1);
         if (endPrice == null)
@@ -246,7 +261,16 @@ public class ProductServiceImpl implements ProductService {
         // Categories
         String[] categories = category.split(",");
         if (!category.isEmpty()) {
+            for (String categoryName : categories) {
+                for (ProductDto product : tempList) {
+                    Optional<Category> foundCategory = categoryRepository.findCategoryByStatusAndChildCategoriesContaining((byte) 1,
+                            ChildCategoryMapper.INSTANCE.toChildCategory(product.getChildCategory()));
+                    if (foundCategory.isPresent() && categoryName.equalsIgnoreCase(foundCategory.get().getName())) {
+                        sortedProductList.add(product);
+                    }
+                }
 
+            }
         }
 
         // Child Categories
@@ -274,7 +298,6 @@ public class ProductServiceImpl implements ProductService {
         }
         return sortedProductList;
     }
-
 
 
 }

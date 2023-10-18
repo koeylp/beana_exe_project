@@ -38,8 +38,9 @@ public class ProductController {
     }
 
     @PutMapping("{productId}")
-    public ResponseEntity<ProductDto> editProduct(@RequestBody @Valid ProductRequestDto productRequest, @PathVariable Long productId) {
-        return ResponseEntity.status(HttpStatus.OK).body(productService.editProduct(productRequest, productId));
+    public ResponseEntity<ProductDto> editProduct(@RequestBody @Valid ProductRequestDto productRequest, @PathVariable Long productId,
+                                                  HttpServletRequest request, HttpServletResponse response) {
+        return ResponseEntity.status(HttpStatus.OK).body(productService.editProduct(productRequest, productId, request, response));
     }
 
     @GetMapping("/price/{startPrice}/{endPrice}")
