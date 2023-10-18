@@ -1,6 +1,7 @@
 package com.exe201.beana.service;
 
 import com.exe201.beana.dto.ProductDto;
+import com.exe201.beana.dto.ProductEditRequestDto;
 import com.exe201.beana.dto.ProductRequestDto;
 import com.exe201.beana.dto.ProductRequestFilterDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,9 +18,9 @@ public interface ProductService {
 
     List<ProductDto> getProductsByChildCategoryId(Long childCategoryId);
 
-    ProductDto editProduct(ProductRequestDto productRequest, Long productId, HttpServletRequest request, HttpServletResponse response);
-
-    List<ProductDto> getProductsByPriceRange(double startPrice, double endPrice);
+    ProductDto editProduct(ProductEditRequestDto productRequest, Long productId, HttpServletRequest request, HttpServletResponse response);
 
     List<ProductDto> filterProductList(String sortType, String category, String childCategory, String skin, String status, String startPrice, String endPrice);
+
+    ProductDto getProductById(Long productId);
 }

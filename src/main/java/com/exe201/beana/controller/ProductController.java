@@ -1,6 +1,7 @@
 package com.exe201.beana.controller;
 
 import com.exe201.beana.dto.ProductDto;
+import com.exe201.beana.dto.ProductEditRequestDto;
 import com.exe201.beana.dto.ProductRequestDto;
 import com.exe201.beana.dto.ProductRequestFilterDto;
 import com.exe201.beana.service.ProductService;
@@ -32,20 +33,20 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getAllProducts());
     }
 
+    @GetMapping("/{productId}")
+    public ResponseEntity<ProductDto> getProductById(@PathVariable Long productId) {
+        return ResponseEntity.ok(productService.getProductById(productId));
+    }
+
     @GetMapping("/childcategories/{childCategoryId}")
     public ResponseEntity<List<ProductDto>> getProductsByChildCategoryId(@PathVariable Long childCategoryId) {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getProductsByChildCategoryId(childCategoryId));
     }
 
     @PutMapping("{productId}")
-    public ResponseEntity<ProductDto> editProduct(@RequestBody @Valid ProductRequestDto productRequest, @PathVariable Long productId,
+    public ResponseEntity<ProductDto> editProduct(@RequestBody @Valid ProductEditRequestDto productRequest, @PathVariable Long productId,
                                                   HttpServletRequest request, HttpServletResponse response) {
         return ResponseEntity.status(HttpStatus.OK).body(productService.editProduct(productRequest, productId, request, response));
-    }
-
-    @GetMapping("/price/{startPrice}/{endPrice}")
-    public ResponseEntity<List<ProductDto>> getProductsByPriceRange(@PathVariable double startPrice, @PathVariable double endPrice) {
-        return ResponseEntity.ok(productService.getProductsByPriceRange(startPrice, endPrice));
     }
 
     @GetMapping("/filter")
