@@ -37,8 +37,7 @@ public class ChildCategoryServiceImpl implements ChildCategoryService {
         temp.setName(newChildCategory.getName());
         temp.setStatus((byte) 1);
         temp.setCategory(foundCategory.get());
-        ChildCategory addedChildCategory = childCategoryRepository.save(temp);
-        return ChildCategoryMapper.INSTANCE.toChildCategoryDto(addedChildCategory);
+        return ChildCategoryMapper.INSTANCE.toChildCategoryDto(childCategoryRepository.save(temp));
     }
 
     @Override

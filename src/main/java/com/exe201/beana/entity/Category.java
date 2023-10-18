@@ -39,6 +39,5 @@ public class Category {
     private byte status;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
-    @JsonBackReference
     private List<ChildCategory> childCategories;
 }

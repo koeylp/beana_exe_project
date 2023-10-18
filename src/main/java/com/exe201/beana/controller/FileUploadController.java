@@ -27,4 +27,5 @@ public class FileUploadController {
         String imageURL = fileUploadService.uploadFile(multipartFile, type, request, response);
         return ResponseEntity.ok("Uploaded photo: " + imageURL);
     }
+
 }

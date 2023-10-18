@@ -17,7 +17,7 @@ public interface ProductService {
 
     List<ProductDto> getProductsByChildCategoryId(Long childCategoryId);
 
-    ProductDto editProduct(ProductRequestDto productRequest, Long productId);
+    ProductDto editProduct(ProductRequestDto productRequest, Long productId, HttpServletRequest request, HttpServletResponse response);
 
     List<ProductDto> getProductsByPriceRange(double startPrice, double endPrice);
 

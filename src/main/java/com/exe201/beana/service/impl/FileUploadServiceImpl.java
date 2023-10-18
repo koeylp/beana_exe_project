@@ -48,7 +48,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     private void saveImageToCookie(ProductImageListDto imageUrls, HttpServletResponse response) {
         Cookie imageCookie = new Cookie(IMAGE_COOKIE_NAME, serializeImageList(imageUrls));
-        imageCookie.setMaxAge(24 * 60 * 60);
+        imageCookie.setMaxAge(10 * 60);
         response.addCookie(imageCookie);
     }
 
