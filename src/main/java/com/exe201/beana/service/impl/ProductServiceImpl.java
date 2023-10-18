@@ -120,8 +120,20 @@ public class ProductServiceImpl implements ProductService {
 
     private void saveImageToCookie(ProductImageListDto imageUrls, HttpServletResponse response) {
         Cookie imageCookie = new Cookie(IMAGE_COOKIE_NAME, serializeImageList(imageUrls));
-        imageCookie.setMaxAge(24 * 60 * 60);
+        imageCookie.setMaxAge(10 * 60);
         response.addCookie(imageCookie);
+    }
+
+    private void clearCookie(ProductImageListDto imageUrls, HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(IMAGE_COOKIE_NAME)) {
+                    cookie.setValue(serializeImageList(imageUrls));
+                    response.addCookie(cookie);
+                }
+            }
+        }
     }
 
     private String serializeImageList(ProductImageListDto imageUrls) {
@@ -181,7 +193,6 @@ public class ProductServiceImpl implements ProductService {
                 throw new ResourceNotFoundException("Reputation does not exist with id: " + productRequest.getReputationId());
         }
 
-
         // check the existence of child category
         if (productRequest.getChildCategoryId() != null) {
             Optional<ChildCategory> foundChildCategory = childCategoryRepository.findChildCategoryByStatusAndId((byte) 1, productRequest.getChildCategoryId());
@@ -216,20 +227,17 @@ public class ProductServiceImpl implements ProductService {
         if (productRequest.getSpecification() != null)
             foundProduct.get().setSpecification(productRequest.getSpecification());
 
-//        for (Long skinId : productRequest.getSkinIds()) {
-//
-//
-//
-//            ProductSkin newProductSkin = new ProductSkin();
-//
-//            Optional<Skin> foundSkin = skinRepository.findSkinByStatusAndId((byte) 1, skinId);
-//            if (foundSkin.isEmpty())
-//                throw new ResourceNotFoundException("Skin not found with id: " + skinId);
-//            newProductSkin.setProduct(editedProduct);
-//            newProductSkin.setSkin(foundSkin.get());
-//            newProductSkin.setStatus((byte) 1);
-//            productSkinList.add(newProductSkin);
-//        }
+/*        for (Long skinId : productRequest.getSkinIds()) {
+            ProductSkin newProductSkin = new ProductSkin();
+
+            Optional<Skin> foundSkin = skinRepository.findSkinByStatusAndId((byte) 1, skinId);
+            if (foundSkin.isEmpty())
+                throw new ResourceNotFoundException("Skin not found with id: " + skinId);
+            newProductSkin.setProduct(editedProduct);
+            newProductSkin.setSkin(foundSkin.get());
+            newProductSkin.setStatus((byte) 1);
+            productSkinList.add(newProductSkin);
+        }*/
 
         // check image list already uploaded
         ProductImageListDto productImageList = getImageFromCookie(request);
