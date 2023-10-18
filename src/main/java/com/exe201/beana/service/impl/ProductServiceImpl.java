@@ -285,9 +285,12 @@ public class ProductServiceImpl implements ProductService {
 
         List<ProductDto> sortedProductList = new ArrayList<>();
 
+        int count = -1;
+
         // Categories
         String[] categories = category.split(",");
         if (!category.isEmpty()) {
+            count++;
             for (String categoryName : categories) {
                 for (ProductDto product : tempList) {
                     Optional<Category> foundCategory = categoryRepository.findCategoryByStatusAndChildCategoriesContaining((byte) 1,
@@ -303,6 +306,7 @@ public class ProductServiceImpl implements ProductService {
         // Child Categories
         String[] childCategories = childCategory.split(",");
         if (!childCategory.isEmpty()) {
+            count++;
             for (String childCategoryName : childCategories) {
                 for (ProductDto product : tempList) {
                     if (childCategoryName.equalsIgnoreCase(product.getChildCategory().getName()))
@@ -313,6 +317,7 @@ public class ProductServiceImpl implements ProductService {
 
         String[] skins = skin.split(",");
         if (!skin.isEmpty()) {
+            count++;
             for (String skinName : skins) {
                 for (ProductDto product : tempList) {
                     for (ProductSkinDto productSkinDto : product.getProductSkins()) {
@@ -322,6 +327,9 @@ public class ProductServiceImpl implements ProductService {
                 }
             }
         }
+
+        if (count == -1)
+            sortedProductList.addAll(tempList);
 
 
         if (sortType.equalsIgnoreCase("moi-nhat")) {
