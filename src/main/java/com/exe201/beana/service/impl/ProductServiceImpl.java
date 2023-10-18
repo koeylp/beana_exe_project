@@ -1,14 +1,12 @@
 package com.exe201.beana.service.impl;
 
-import com.exe201.beana.dto.ProductDto;
-import com.exe201.beana.dto.ProductImageListDto;
-import com.exe201.beana.dto.ProductRequestDto;
-import com.exe201.beana.dto.ProductRequestFilterDto;
+import com.exe201.beana.dto.*;
 import com.exe201.beana.entity.*;
 import com.exe201.beana.exception.ResourceAlreadyExistsException;
 import com.exe201.beana.exception.ResourceNotFoundException;
 import com.exe201.beana.mapper.ChildCategoryMapper;
 import com.exe201.beana.mapper.ProductMapper;
+import com.exe201.beana.mapper.SkinMapper;
 import com.exe201.beana.repository.*;
 import com.exe201.beana.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -122,8 +120,20 @@ public class ProductServiceImpl implements ProductService {
 
     private void saveImageToCookie(ProductImageListDto imageUrls, HttpServletResponse response) {
         Cookie imageCookie = new Cookie(IMAGE_COOKIE_NAME, serializeImageList(imageUrls));
-        imageCookie.setMaxAge(24 * 60 * 60);
+        imageCookie.setMaxAge(10 * 60);
         response.addCookie(imageCookie);
+    }
+
+    private void clearCookie(ProductImageListDto imageUrls, HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(IMAGE_COOKIE_NAME)) {
+                    cookie.setValue(serializeImageList(imageUrls));
+                    response.addCookie(cookie);
+                }
+            }
+        }
     }
 
     private String serializeImageList(ProductImageListDto imageUrls) {
@@ -169,78 +179,91 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto editProduct(ProductRequestDto productRequest, Long productId, HttpServletRequest request, HttpServletResponse response) {
+    public ProductDto editProduct(ProductEditRequestDto productRequest, Long productId, HttpServletRequest request, HttpServletResponse response) {
+
+        // check the existence of product
         Optional<Product> foundProduct = productRepository.findProductByStatusAndId((byte) 1, productId);
         if (foundProduct.isEmpty())
             throw new ResourceNotFoundException("Product not found with id: " + productId);
 
-        Optional<Reputation> foundReputation = reputationRepository.findReputationByStatusAndId((byte) 1, productRequest.getReputationId());
-        if (foundReputation.isEmpty())
-            throw new ResourceNotFoundException("Reputation does not exist with id: " + productRequest.getReputationId());
+        // check the existence of reputation
+        if (productRequest.getReputationId() != null) {
+            Optional<Reputation> foundReputation = reputationRepository.findReputationByStatusAndId((byte) 1, productRequest.getReputationId());
+            if (foundReputation.isEmpty())
+                throw new ResourceNotFoundException("Reputation does not exist with id: " + productRequest.getReputationId());
+        }
 
-        Optional<ChildCategory> foundChildCategory = childCategoryRepository.findChildCategoryByStatusAndId((byte) 1, productRequest.getChildCategoryId());
-        if (foundChildCategory.isEmpty())
-            throw new ResourceNotFoundException("Child category does not exist with id: " + productRequest.getChildCategoryId());
+        // check the existence of child category
+        if (productRequest.getChildCategoryId() != null) {
+            Optional<ChildCategory> foundChildCategory = childCategoryRepository.findChildCategoryByStatusAndId((byte) 1, productRequest.getChildCategoryId());
+            if (foundChildCategory.isEmpty())
+                throw new ResourceNotFoundException("Child category does not exist with id: " + productRequest.getChildCategoryId());
+        }
 
-        Product newProduct = getProduct(productRequest, foundChildCategory, foundReputation);
-        productRepository.save(newProduct);
+        if (productRequest.getName() != null)
+            foundProduct.get().setName(productRequest.getName());
 
-        List<ProductSkin> productSkinList = new ArrayList<>();
+        if (productRequest.getQuantity() != -1)
+            foundProduct.get().setQuantity(productRequest.getQuantity());
 
-        for (Long skinId : productRequest.getSkinIds()) {
+        if (productRequest.getPrice() != -1)
+            foundProduct.get().setPrice(productRequest.getPrice());
+
+        if (productRequest.getCertification() != null)
+            foundProduct.get().setDescription(productRequest.getDescription());
+
+        if (productRequest.getMainFunction() != null)
+            foundProduct.get().setMainFunction(productRequest.getMainFunction());
+
+        if (productRequest.getIngredients() != null)
+            foundProduct.get().setIngredients(productRequest.getIngredients());
+
+        if (productRequest.getHowToUse() != null)
+            foundProduct.get().setHowToUse(productRequest.getHowToUse());
+
+        if (productRequest.getCertification() != null)
+            foundProduct.get().setCertification(productRequest.getCertification());
+
+        if (productRequest.getSpecification() != null)
+            foundProduct.get().setSpecification(productRequest.getSpecification());
+
+/*        for (Long skinId : productRequest.getSkinIds()) {
             ProductSkin newProductSkin = new ProductSkin();
+
             Optional<Skin> foundSkin = skinRepository.findSkinByStatusAndId((byte) 1, skinId);
             if (foundSkin.isEmpty())
                 throw new ResourceNotFoundException("Skin not found with id: " + skinId);
-            newProductSkin.setProduct(newProduct);
+            newProductSkin.setProduct(editedProduct);
             newProductSkin.setSkin(foundSkin.get());
             newProductSkin.setStatus((byte) 1);
             productSkinList.add(newProductSkin);
-        }
-//        productSkinRepository.saveAll(productSkinList);
-//
-//        newProduct.setProductSkins(productSkinList);
-//        foundProduct.get().setName(productRequest.getName());
-//        foundProduct.get().setPrice(productRequest.getPrice());
-//        foundProduct.get().setReputation(foundReputation.get());
-//        foundProduct.get().setProductSkins(productSkinList);
-//        foundProduct.get().setIngredients(productRequest.getIngredients());
-//        foundProduct.get().setSpecification(productRequest.getSpecification());
-//        foundProduct.get().setStatus((byte) 1);
-//        foundProduct.get().setMainFunction(productRequest.getMainFunction());
-//        foundProduct.get().setHowToUse(productRequest.getHowToUse());
-//        foundProduct.get().setProductImageList();
+        }*/
 
         // check image list already uploaded
         ProductImageListDto productImageList = getImageFromCookie(request);
 
-        // get image uploaded from cookie and save to database
-        newProduct.setProductImageList(productImageList.getProductImageList());
+        if (!productImageList.getProductImageList().isEmpty()) {
+            for (ProductImage productImage : productImageList.getProductImageList()) {
+                productImage.setProduct(foundProduct.get());
+                productImageRepository.save(productImage);
+            }
 
-        for (ProductImage productImage : productImageList.getProductImageList()) {
-            productImage.setProduct(newProduct);
-            productImageRepository.save(productImage);
+            productImageList.getProductImageList().addAll(foundProduct.get().getProductImageList());
+            // get image uploaded from cookie and save to database
+            foundProduct.get().setProductImageList(productImageList.getProductImageList());
+
+            // clear images after done saving
+            productImageList.getProductImageList().clear();
+            saveImageToCookie(productImageList, response);
         }
-
-        // clear images after done saving
-        productImageList.getProductImageList().clear();
-        saveImageToCookie(productImageList, response);
-
 
         return ProductMapper.INSTANCE.toProductDto(productRepository.save(foundProduct.get()));
     }
 
-    @Override
-    public List<ProductDto> getProductsByPriceRange(double startPrice, double endPrice) {
-        List<ProductDto> sortedProductList = new ArrayList<>(productRepository.findAllByStatusAndPriceBetween((byte) 1, startPrice, endPrice).stream().map(ProductMapper.INSTANCE::toProductDto).toList());
-        Collections.sort(sortedProductList, Comparator.comparing(ProductDto::getPrice));
-        return sortedProductList;
-    }
 
     @Override
     public List<ProductDto> filterProductList(String sortType, String category, String childCategory,
                                               String skin, String status, String startPrice, String endPrice) {
-
 
         /* sortType....
          0 : "Mới nhất"
@@ -248,11 +271,15 @@ public class ProductServiceImpl implements ProductService {
          2 : "Giá từ thấp đến cao"
          3 : "Giá từ cao đến thấp" */
 
-
+        // check null and assign value
         if (status == null)
             status = String.valueOf(1);
+        if (startPrice == null)
+            startPrice = String.valueOf(0);
         if (endPrice == null)
             endPrice = String.valueOf(Double.MAX_VALUE);
+
+
         List<ProductDto> tempList = new ArrayList<>(productRepository.findAllByStatusAndPriceBetween(Byte.parseByte(status),
                 Double.parseDouble(startPrice), Double.parseDouble(endPrice)).stream().map(ProductMapper.INSTANCE::toProductDto).toList());
 
@@ -276,16 +303,26 @@ public class ProductServiceImpl implements ProductService {
         // Child Categories
         String[] childCategories = childCategory.split(",");
         if (!childCategory.isEmpty()) {
-
+            for (String childCategoryName : childCategories) {
+                for (ProductDto product : tempList) {
+                    if (childCategoryName.equalsIgnoreCase(product.getChildCategory().getName()))
+                        sortedProductList.add(product);
+                }
+            }
         }
 
         String[] skins = skin.split(",");
         if (!skin.isEmpty()) {
-
+            for (String skinName : skins) {
+                for (ProductDto product : tempList) {
+                    for (ProductSkinDto productSkinDto : product.getProductSkins()) {
+                        if (productSkinDto.getSkin().getName().equalsIgnoreCase(skinName))
+                            sortedProductList.add(product);
+                    }
+                }
+            }
         }
 
-
-        //
 
         if (sortType.equalsIgnoreCase("moi-nhat")) {
             sortedProductList.sort(Comparator.comparing(ProductDto::getTimeCreated).reversed());
@@ -297,6 +334,14 @@ public class ProductServiceImpl implements ProductService {
             sortedProductList.sort(Comparator.comparing(ProductDto::getPrice).reversed());
         }
         return sortedProductList;
+    }
+
+    @Override
+    public ProductDto getProductById(Long productId) {
+        Optional<Product> foundProduct = productRepository.findProductByStatusAndId((byte) 1, productId);
+        if (foundProduct.isEmpty())
+            throw new ResourceNotFoundException("Product not found with id:" + productId);
+        return ProductMapper.INSTANCE.toProductDto(foundProduct.get());
     }
 
 
