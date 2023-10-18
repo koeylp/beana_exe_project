@@ -3,7 +3,6 @@ package com.exe201.beana.controller;
 import com.exe201.beana.dto.ProductDto;
 import com.exe201.beana.dto.ProductEditRequestDto;
 import com.exe201.beana.dto.ProductRequestDto;
-import com.exe201.beana.dto.ProductRequestFilterDto;
 import com.exe201.beana.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,7 +10,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

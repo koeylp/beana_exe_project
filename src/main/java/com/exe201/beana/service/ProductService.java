@@ -3,7 +3,6 @@ package com.exe201.beana.service;
 import com.exe201.beana.dto.ProductDto;
 import com.exe201.beana.dto.ProductEditRequestDto;
 import com.exe201.beana.dto.ProductRequestDto;
-import com.exe201.beana.dto.ProductRequestFilterDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;

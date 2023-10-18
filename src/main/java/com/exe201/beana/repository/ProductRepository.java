@@ -1,10 +1,8 @@
 package com.exe201.beana.repository;
 
-import com.exe201.beana.dto.ProductRequestFilterDto;
 import com.exe201.beana.entity.ChildCategory;
 import com.exe201.beana.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;

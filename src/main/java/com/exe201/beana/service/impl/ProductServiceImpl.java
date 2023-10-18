@@ -234,18 +234,20 @@ public class ProductServiceImpl implements ProductService {
         // check image list already uploaded
         ProductImageListDto productImageList = getImageFromCookie(request);
 
-//         get image uploaded from cookie and save to database
-        foundProduct.get().setProductImageList(productImageList.getProductImageList());
+        if (!productImageList.getProductImageList().isEmpty()) {
+            for (ProductImage productImage : productImageList.getProductImageList()) {
+                productImage.setProduct(foundProduct.get());
+                productImageRepository.save(productImage);
+            }
 
-        for (ProductImage productImage : productImageList.getProductImageList()) {
-            productImage.setProduct(foundProduct.get());
-            productImageRepository.save(productImage);
+            productImageList.getProductImageList().addAll(foundProduct.get().getProductImageList());
+            // get image uploaded from cookie and save to database
+            foundProduct.get().setProductImageList(productImageList.getProductImageList());
+
+            // clear images after done saving
+            productImageList.getProductImageList().clear();
+            saveImageToCookie(productImageList, response);
         }
-
-        // clear images after done saving
-        productImageList.getProductImageList().clear();
-        saveImageToCookie(productImageList, response);
-
 
         return ProductMapper.INSTANCE.toProductDto(productRepository.save(foundProduct.get()));
     }
