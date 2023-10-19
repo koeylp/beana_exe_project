@@ -26,13 +26,13 @@ public class CartServiceImpl implements CartService {
     @Override
     public void addItemToCart(ItemDto item, HttpServletRequest request, HttpServletResponse response) {
         CartDto cart = getCart(request);
-        if (cart == null)
-            cart = new CartDto();
-        for (CartItemDto cartItem : cart.getItems()) {
-            if (Objects.equals(cartItem.getItem().getId(), item.getId())) {
-                cartItem.setQuantity(cartItem.getQuantity() + item.getCartQuantity());
-                saveCartToCookie(cart, response);
-                return;
+        if (cart.getItems() != null) {
+            for (CartItemDto cartItem : cart.getItems()) {
+                if (Objects.equals(cartItem.getItem().getId(), item.getId())) {
+                    cartItem.setQuantity(cartItem.getQuantity() + item.getCartQuantity());
+                    saveCartToCookie(cart, response);
+                    return;
+                }
             }
         }
         cart.addItem(item, item.getCartQuantity());
@@ -69,7 +69,7 @@ public class CartServiceImpl implements CartService {
 
     private void saveCartToCookie(CartDto cart, HttpServletResponse response) {
         Cookie cartCookie = new Cookie(CART_COOKIE_NAME, serializeCart(cart));
-        cartCookie.setMaxAge(24 * 60 * 60);
+        cartCookie.setMaxAge(24 * 60 * 60 * 1000);
         response.addCookie(cartCookie);
     }
 

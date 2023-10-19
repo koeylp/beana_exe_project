@@ -105,7 +105,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "api/v1/addresses").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
                         .requestMatchers(HttpMethod.PUT, "api/v1/addresses").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
                         .requestMatchers(HttpMethod.DELETE, "api/v1/addresses").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
-                        .requestMatchers(HttpMethod.GET, "api/v1/addresses").permitAll());
+                        .requestMatchers(HttpMethod.GET, "api/v1/addresses/**").permitAll());
 
 
         return http.build();

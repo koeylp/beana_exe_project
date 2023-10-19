@@ -50,6 +50,8 @@ public class OrderServiceImpl implements OrderService {
             Optional<Product> foundProduct = productRepository.findProductByStatusAndId((byte) 1, currentProductId);
             if (foundProduct.isEmpty())
                 throw new ResourceNotFoundException("Product not found with id: " + currentProductId);
+            foundProduct.get().setSoldQuantity(foundProduct.get().getSoldQuantity() + orderRequestDto.getOrderDetailsList().get(i).getQuantity());
+            foundProduct.get().setQuantity(foundProduct.get().getSoldQuantity() - orderRequestDto.getOrderDetailsList().get(i).getQuantity());
             tempOrderDetailsList.add(new OrderDetailsDto(null, orderRequestDto.getOrderDetailsList().get(i).getQuantity(), null, (byte) 1, OrderMapper.INSTANCE.toOrderDto(tempOrder), ProductMapper.INSTANCE.toProductDto(foundProduct.get())));
         }
 
