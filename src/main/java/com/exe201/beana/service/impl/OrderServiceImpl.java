@@ -10,6 +10,7 @@ import com.exe201.beana.mapper.ProductMapper;
 import com.exe201.beana.repository.*;
 import com.exe201.beana.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,9 +31,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto addOrder(OrderRequestDto orderRequestDto) {
-        Optional<User> foundUser = userRepository.findUserByStatusAndId((byte) 1, orderRequestDto.getUserId());
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<User> foundUser = userRepository.findUserByStatusAndUsername((byte) 1, username);
         if (foundUser.isEmpty())
-            throw new ResourceNotFoundException("User not found with Id: " + orderRequestDto.getUserId());
+            throw new ResourceNotFoundException("User Not found with username: " + username);
 
         Optional<Address> foundAddress = addressRepository.findAddressByStatusAndId((byte) 1, orderRequestDto.getAddressId());
         if (foundAddress.isEmpty())
@@ -68,10 +70,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> getOrdersByUserId(Long userId) {
-        Optional<User> foundUser = userRepository.findUserByStatusAndId((byte) 1, userId);
+    public List<OrderDto> getOrdersByUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<User> foundUser = userRepository.findUserByStatusAndUsername((byte) 1, username);
         if (foundUser.isEmpty())
-            throw new ResourceNotFoundException("User not found with Id: " + userId);
+            throw new ResourceNotFoundException("User Not found with username: " + username);
         return orderRepository.findAllByStatusAndUser((byte) 1, foundUser.get()).stream().map(OrderMapper.INSTANCE::toOrderDto).collect(Collectors.toList());
     }
 }

@@ -17,9 +17,6 @@ public class OrderRequestDto {
     @NotNull(message = "Amount is required")
     private double amount;
 
-    @NotNull(message = "UserId is required")
-    private Long userId;
-
     @NotNull(message = "AddressId is required")
     private Long addressId;
 

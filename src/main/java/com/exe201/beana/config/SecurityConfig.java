@@ -1,6 +1,9 @@
 package com.exe201.beana.config;
 
-import com.exe201.beana.filter.*;
+import com.exe201.beana.filter.AuthoritiesLoggingAfterFilter;
+import com.exe201.beana.filter.AuthoritiesLoggingAtFilter;
+import com.exe201.beana.filter.JWTAuthenticationFilter;
+import com.exe201.beana.filter.RequestValidationBeforeFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,10 +15,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfFilter;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.savedrequest.NullRequestCache;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -35,6 +34,7 @@ public class SecurityConfig {
 //    private final CsrfTokenResponseHeaderBindingFilter csrfTokenResponseHeaderBindingFilter;
     private final static String ROLE_MANAGER = "MANAGER";
     private final static String ROLE_CUSTOMER = "CUSTOMER";
+    private final AuthEntryPoint authenticationEntryPoint;
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -99,13 +99,14 @@ public class SecurityConfig {
                         // cart
                         .requestMatchers("api/v1/cart/**").permitAll()
                         // order
-                        .requestMatchers(HttpMethod.POST, "api/v1/orders").hasRole(ROLE_CUSTOMER)
-                        .requestMatchers(HttpMethod.GET, "api/v1/orders/**").hasRole(ROLE_CUSTOMER)
+                        .requestMatchers(HttpMethod.POST, "api/v1/orders").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
+                        .requestMatchers(HttpMethod.GET, "api/v1/orders").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
                         // address
                         .requestMatchers(HttpMethod.POST, "api/v1/addresses").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
                         .requestMatchers(HttpMethod.PUT, "api/v1/addresses").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
                         .requestMatchers(HttpMethod.DELETE, "api/v1/addresses").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
                         .requestMatchers(HttpMethod.GET, "api/v1/addresses/**").permitAll());
+        http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(authenticationEntryPoint));
 
 
         return http.build();

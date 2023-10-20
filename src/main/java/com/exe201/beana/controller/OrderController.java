@@ -24,8 +24,8 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderService.addOrder(orderRequestDto));
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<OrderDto>> getOrdersByUserId(@PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrdersByUserId(userId));
+    @GetMapping("")
+    public ResponseEntity<List<OrderDto>> getOrdersByUser() {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrdersByUser());
     }
 }

@@ -48,6 +48,10 @@ public class ProductDto {
 
     private String howToUse;
 
+    private int rateCount;
+
+    private float totalRate;
+
     private byte status;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm a z")

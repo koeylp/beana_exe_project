@@ -1,5 +1,6 @@
 package com.exe201.beana.config;
 
+import com.exe201.beana.exception.ResourceNotFoundException;
 import com.exe201.beana.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +23,7 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findUserByStatusAndUsername((byte) 1, username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User does not exist with username: " + username));
     }
 
     @Bean

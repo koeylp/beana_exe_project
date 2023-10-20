@@ -60,6 +60,10 @@ public class Product {
     @Column(name = "howToUse", columnDefinition = "MEDIUMTEXT")
     private String howToUse;
 
+    private int rateCount;
+
+    private float totalRate;
+
     @Column(name = "status", nullable = false)
     private byte status;
 
