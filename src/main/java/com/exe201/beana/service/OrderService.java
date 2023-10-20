@@ -10,5 +10,5 @@ import java.util.List;
 public interface OrderService {
     OrderDto addOrder(OrderRequestDto orderRequestDto);
 
-    List<OrderDto> getOrdersByUserId(Long userId);
+    List<OrderDto> getOrdersByUser();
 }
