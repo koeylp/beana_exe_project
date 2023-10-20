@@ -40,7 +40,4 @@ public class AddressRequestDto {
     @NotEmpty(message = "Address is required")
     @NotBlank(message = "The property is not null or whitespace")
     private String address;
-
-    @NotNull(message = "userId is required")
-    private Long userId;
 }

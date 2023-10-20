@@ -26,9 +26,10 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressDto addAddress(AddressRequestDto addressRequest) {
-        Optional<User> foundUser = userRepository.findUserByStatusAndId((byte) 1, addressRequest.getUserId());
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<User> foundUser = userRepository.findUserByStatusAndUsername((byte) 1, username);
         if (foundUser.isEmpty())
-            throw new ResourceNotFoundException("User not found with id: " + addressRequest.getUserId());
+            throw new ResourceNotFoundException("User Not found with username: " + username);
         var newAddress = Address.builder()
                 .fullName(addressRequest.getFullName())
                 .phone(addressRequest.getPhone())
