@@ -39,7 +39,7 @@ public class RegisterRequestDto {
     @NotNull(message = "gender is required")
     private int gender;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM/dd/yyyy")
     private Date dob;
 
     @NotEmpty(message = "Password is required")
