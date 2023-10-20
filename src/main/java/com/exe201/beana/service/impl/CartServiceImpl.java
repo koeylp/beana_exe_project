@@ -70,7 +70,7 @@ public class CartServiceImpl implements CartService {
     private void saveCartToCookie(CartDto cart, HttpServletResponse response) {
         Cookie cartCookie = new Cookie(CART_COOKIE_NAME, serializeCart(cart));
         cartCookie.setMaxAge(24 * 60 * 60 * 1000);
-        cartCookie.setSecure(true);
+//        cartCookie.setSecure(true);
         cartCookie.setHttpOnly(true);
         response.addCookie(cartCookie);
     }
