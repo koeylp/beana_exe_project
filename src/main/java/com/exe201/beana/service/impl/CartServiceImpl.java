@@ -39,6 +39,16 @@ public class CartServiceImpl implements CartService {
         saveCartToCookie(cart, response);
     }
 
+    private void addSameSiteCookieAttribute(HttpServletResponse response, String cookieName) {
+        if (response != null && response.containsHeader("Set-Cookie")) {
+            for (String header : response.getHeaders("Set-Cookie")) {
+                if (header.contains(cookieName)) {
+                    response.setHeader("Set-Cookie", String.format("%s; %s", header, "SameSite=None; Secure"));
+                }
+            }
+        }
+    }
+
     @Override
     public CartDto getCart(HttpServletRequest request) {
         return getCartFromCookie(request);
@@ -71,6 +81,7 @@ public class CartServiceImpl implements CartService {
         Cookie cartCookie = new Cookie(CART_COOKIE_NAME, serializeCart(cart));
         cartCookie.setMaxAge(24 * 60 * 60 * 1000);
         response.addCookie(cartCookie);
+        addSameSiteCookieAttribute(response, CART_COOKIE_NAME);
     }
 
     private String serializeCart(CartDto cart) {
