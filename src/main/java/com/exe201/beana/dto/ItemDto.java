@@ -15,17 +15,12 @@ import lombok.Setter;
 public class ItemDto {
     private Long id;
 
-    @NotEmpty(message = "name is required")
-    @NotBlank(message = "The property is not null or whitespace")
     private String name;
 
-    @NotNull(message = "quantity is required")
     private int quantity;
 
-    @NotNull(message = "price is required")
     private double price;
 
-    @NotNull(message = "cartQuantity is required")
     private int cartQuantity;
 
 }
