@@ -49,8 +49,6 @@ public class CartServiceImpl implements CartService {
         CartDto cart = getCart(request);
         if (cart.getItems() == null)
             throw new ResourceNotFoundException("Cart is null");
-        if (!cart.getItems().contains(item))
-            throw new ResourceNotFoundException("Item not found in cart");
         cart.removeItem(item);
         saveCartToCookie(cart, response);
     }
