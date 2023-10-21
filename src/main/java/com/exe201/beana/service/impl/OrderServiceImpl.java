@@ -46,7 +46,8 @@ public class OrderServiceImpl implements OrderService {
             throw new ResourceNotFoundException("Payment not found with id: " + orderRequestDto.getPaymentId());
 
         Order newOrder = new Order(null, null, orderRequestDto.getAmount(), (byte) 1, foundUser.get(), foundAddress.get(), foundPayment.get(), null);
-        Order tempOrder = orderRepository.save(newOrder);
+        Order tempOrder = new Order();
+
         List<OrderDetailsDto> tempOrderDetailsList = new ArrayList<>();
         for (int i = 0; i < orderRequestDto.getOrderDetailsList().size(); i++) {
             Long currentProductId = orderRequestDto.getOrderDetailsList().get(i).getProductId();
@@ -56,16 +57,18 @@ public class OrderServiceImpl implements OrderService {
 
             // check quantity
             if (foundProduct.get().getQuantity() - orderRequestDto.getOrderDetailsList().get(i).getQuantity() < 0)
-                throw new AccessDeniedException("The quantity of product with id" + orderRequestDto.getOrderDetailsList().get(i).getProductId()
+                throw new AccessDeniedException("The quantity of product with id " + orderRequestDto.getOrderDetailsList().get(i).getProductId()
                         + "must less than or equal to " + foundProduct.get().getQuantity());
 
             // edit quantity when the condition of quantity is checked well
             foundProduct.get().setSoldQuantity(foundProduct.get().getSoldQuantity() + orderRequestDto.getOrderDetailsList().get(i).getQuantity());
-            foundProduct.get().setQuantity(foundProduct.get().getSoldQuantity() - orderRequestDto.getOrderDetailsList().get(i).getQuantity());
+            foundProduct.get().setQuantity(foundProduct.get().getQuantity() - orderRequestDto.getOrderDetailsList().get(i).getQuantity());
 
             // if out of stock set status to 0
             if (foundProduct.get().getQuantity() == 0)
                 foundProduct.get().setStatus((byte) 0);
+
+            tempOrder = orderRepository.save(newOrder);
 
             tempOrderDetailsList.add(new OrderDetailsDto(null, orderRequestDto.getOrderDetailsList().get(i).getQuantity(), null, (byte) 1, OrderMapper.INSTANCE.toOrderDto(tempOrder), ProductMapper.INSTANCE.toProductDto(foundProduct.get())));
         }

@@ -182,7 +182,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto editProduct(ProductEditRequestDto productRequest, Long productId, HttpServletRequest request, HttpServletResponse response) {
 
         // check the existence of product
-        Optional<Product> foundProduct = productRepository.findProductByStatusAndId((byte) 1, productId);
+        Optional<Product> foundProduct = productRepository.findById(productId);
         if (foundProduct.isEmpty())
             throw new ResourceNotFoundException("Product not found with id: " + productId);
 
