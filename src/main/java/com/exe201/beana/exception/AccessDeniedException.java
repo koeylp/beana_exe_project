@@ -1,7 +1,7 @@
 package com.exe201.beana.exception;
 
 public class AccessDeniedException extends RuntimeException {
-    AccessDeniedException(String message) {
+    public AccessDeniedException(String message) {
         super(message);
     }
 }

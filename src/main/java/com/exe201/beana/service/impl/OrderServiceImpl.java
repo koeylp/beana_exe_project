@@ -4,6 +4,7 @@ import com.exe201.beana.dto.OrderDetailsDto;
 import com.exe201.beana.dto.OrderDto;
 import com.exe201.beana.dto.OrderRequestDto;
 import com.exe201.beana.entity.*;
+import com.exe201.beana.exception.AccessDeniedException;
 import com.exe201.beana.exception.ResourceNotFoundException;
 import com.exe201.beana.mapper.OrderMapper;
 import com.exe201.beana.mapper.ProductMapper;
@@ -52,8 +53,20 @@ public class OrderServiceImpl implements OrderService {
             Optional<Product> foundProduct = productRepository.findProductByStatusAndId((byte) 1, currentProductId);
             if (foundProduct.isEmpty())
                 throw new ResourceNotFoundException("Product not found with id: " + currentProductId);
+
+            // check quantity
+            if (foundProduct.get().getQuantity() - orderRequestDto.getOrderDetailsList().get(i).getQuantity() < 0)
+                throw new AccessDeniedException("The quantity of product with id" + orderRequestDto.getOrderDetailsList().get(i).getProductId()
+                        + "must less than or equal to " + foundProduct.get().getQuantity());
+
+            // edit quantity when the condition of quantity is checked well
             foundProduct.get().setSoldQuantity(foundProduct.get().getSoldQuantity() + orderRequestDto.getOrderDetailsList().get(i).getQuantity());
             foundProduct.get().setQuantity(foundProduct.get().getSoldQuantity() - orderRequestDto.getOrderDetailsList().get(i).getQuantity());
+
+            // if out of stock set status to 0
+            if (foundProduct.get().getQuantity() == 0)
+                foundProduct.get().setStatus((byte) 0);
+
             tempOrderDetailsList.add(new OrderDetailsDto(null, orderRequestDto.getOrderDetailsList().get(i).getQuantity(), null, (byte) 1, OrderMapper.INSTANCE.toOrderDto(tempOrder), ProductMapper.INSTANCE.toProductDto(foundProduct.get())));
         }
 
