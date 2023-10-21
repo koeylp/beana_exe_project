@@ -29,7 +29,7 @@ public class CartController {
         return ResponseEntity.ok(cart);
     }
 
-    @DeleteMapping("/remove")
+    @PostMapping("/remove")
     public ResponseEntity<String> removeItem(@RequestBody @Valid ItemDto item, HttpServletRequest request, HttpServletResponse response) {
         cartService.removeItem(item, request, response);
         return ResponseEntity.ok("Removed item.");
