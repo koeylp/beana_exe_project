@@ -166,7 +166,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDto> getAllProducts() {
         List<ProductDto> sortedProductList = new ArrayList<>(productRepository.findAllByStatus((byte) 1).stream().map(ProductMapper.INSTANCE::toProductDto).toList());
-        Collections.sort(sortedProductList, Comparator.comparing(ProductDto::getTimeCreated).reversed());
+        sortedProductList.sort(Comparator.comparing(ProductDto::getTimeCreated).reversed());
         return sortedProductList;
     }
 
@@ -226,18 +226,6 @@ public class ProductServiceImpl implements ProductService {
 
         if (productRequest.getSpecification() != null)
             foundProduct.get().setSpecification(productRequest.getSpecification());
-
-/*        for (Long skinId : productRequest.getSkinIds()) {
-            ProductSkin newProductSkin = new ProductSkin();
-
-            Optional<Skin> foundSkin = skinRepository.findSkinByStatusAndId((byte) 1, skinId);
-            if (foundSkin.isEmpty())
-                throw new ResourceNotFoundException("Skin not found with id: " + skinId);
-            newProductSkin.setProduct(editedProduct);
-            newProductSkin.setSkin(foundSkin.get());
-            newProductSkin.setStatus((byte) 1);
-            productSkinList.add(newProductSkin);
-        }*/
 
         // check image list already uploaded
         ProductImageListDto productImageList = getImageFromCookie(request);

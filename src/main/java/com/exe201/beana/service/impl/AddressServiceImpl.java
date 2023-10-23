@@ -40,6 +40,11 @@ public class AddressServiceImpl implements AddressService {
                 .status((byte) 1)
                 .user(foundUser.get())
                 .build();
+        List<Address> addresses = addressRepository.findAllByUser(foundUser.get());
+        for (Address address : addresses) {
+            if (address.getStatus() == 1)
+                address.setStatus((byte) 0);
+        }
         return AddressMapper.INSTANCE.toAddressDto(addressRepository.save(newAddress));
     }
 
@@ -49,8 +54,28 @@ public class AddressServiceImpl implements AddressService {
         Optional<User> foundUser = userRepository.findUserByStatusAndUsername((byte) 1, username);
         if (foundUser.isEmpty())
             throw new ResourceNotFoundException("User Not found with username: " + username);
-        return addressRepository.findAllByStatusAndUser((byte) 1,
+        return addressRepository.findAllByUser(
                         foundUser.get()).stream().map(AddressMapper.INSTANCE::toAddressDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public AddressDto setDefaultAddress(Long addressId) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<User> foundUser = userRepository.findUserByStatusAndUsername((byte) 1, username);
+        if (foundUser.isEmpty())
+            throw new ResourceNotFoundException("User Not found with username: " + username);
+
+        Optional<Address> defaultAddress = addressRepository.findByStatusAndUser((byte) 1, foundUser.get());
+        if (defaultAddress.isEmpty())
+            throw new ResourceNotFoundException("Default address not found");
+        defaultAddress.get().setStatus((byte) 0);
+        addressRepository.save(defaultAddress.get());
+
+        Optional<Address> foundAddress = addressRepository.findByIdAndUser(addressId, foundUser.get());
+        if (foundAddress.isEmpty())
+            throw new ResourceNotFoundException("Address Not found with id: " + addressId + " for username: " + username);
+        foundAddress.get().setStatus((byte) 1);
+        return AddressMapper.INSTANCE.toAddressDto(addressRepository.save(foundAddress.get()));
     }
 }

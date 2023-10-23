@@ -23,9 +23,14 @@ public class AddressController {
         return ResponseEntity.status(HttpStatus.CREATED).body(addressService.addAddress(addressRequest));
     }
 
-    @GetMapping("/get")
+    @GetMapping("")
     public ResponseEntity<List<AddressDto>> getAddressesByUser() {
         return ResponseEntity.ok(addressService.getAddressesByUser());
+    }
+
+    @PutMapping("/default/{addressId}")
+    public ResponseEntity<AddressDto> setDefaultAddress(@PathVariable Long addressId) {
+        return ResponseEntity.ok(addressService.setDefaultAddress(addressId));
     }
 
 

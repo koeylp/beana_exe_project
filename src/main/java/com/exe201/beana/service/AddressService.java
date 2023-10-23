@@ -11,4 +11,6 @@ public interface AddressService {
     AddressDto addAddress(AddressRequestDto addressRequest);
 
     List<AddressDto> getAddressesByUser();
+
+    AddressDto setDefaultAddress(Long addressId);
 }
