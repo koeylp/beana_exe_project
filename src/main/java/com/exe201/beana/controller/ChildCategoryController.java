@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/childcategories")
+@RequestMapping("/api/v1/child-categories")
 public class ChildCategoryController {
 
     private final ChildCategoryService childCategoryService;

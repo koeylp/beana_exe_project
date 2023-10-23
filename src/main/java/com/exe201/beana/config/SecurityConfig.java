@@ -32,7 +32,7 @@ public class SecurityConfig {
     private final AuthoritiesLoggingAtFilter authoritiesLoggingAtFilter;
     private final AuthenticationProvider authenticationProvider;
     private final RequestValidationBeforeFilter requestValidationBeforeFilter;
-//    private final CsrfTokenResponseHeaderBindingFilter csrfTokenResponseHeaderBindingFilter;
+    //    private final CsrfTokenResponseHeaderBindingFilter csrfTokenResponseHeaderBindingFilter;
     private final static String ROLE_MANAGER = "MANAGER";
     private final static String ROLE_CUSTOMER = "CUSTOMER";
     private final AuthEntryPoint authenticationEntryPoint;
@@ -106,7 +106,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "api/v1/addresses").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
                         .requestMatchers(HttpMethod.PUT, "api/v1/addresses").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
                         .requestMatchers(HttpMethod.DELETE, "api/v1/addresses").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
-                        .requestMatchers(HttpMethod.GET, "api/v1/addresses/**").permitAll());
+                        .requestMatchers(HttpMethod.GET, "api/v1/addresses/**").permitAll().anyRequest().permitAll());
 
         http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(authenticationEntryPoint));
 
