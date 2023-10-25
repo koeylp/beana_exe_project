@@ -11,4 +11,7 @@ public interface CartService {
     CartDto getCart(HttpServletRequest request);
 
     void removeItem(ItemDto item, HttpServletRequest request, HttpServletResponse response);
+
+
+    void updateQuantity(ItemDto item, String type, HttpServletRequest request, HttpServletResponse response);
 }
