@@ -35,5 +35,11 @@ public class CartController {
         return ResponseEntity.ok("Removed item.");
     }
 
+    @PostMapping("/quantity/{type}")
+    public ResponseEntity<String> updateQuantity(@RequestBody ItemDto item, @PathVariable String type, HttpServletRequest request, HttpServletResponse response) {
+        cartService.updateQuantity(item, type, request, response);
+        return ResponseEntity.ok("Minus one");
+    }
+
 
 }

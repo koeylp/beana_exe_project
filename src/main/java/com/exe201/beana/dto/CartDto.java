@@ -26,13 +26,8 @@ public class CartDto {
         items.removeIf(cartItem -> Objects.equals(cartItem.getItem().getId(), item.getId()));
     }
 
-    public void updateQuantity(ItemDto item, int quantity) {
-        for (CartItemDto cartItem : items) {
-            if (Objects.equals(cartItem.getItem().getId(), item.getId())) {
-                cartItem.setQuantity(quantity);
-                return;
-            }
-        }
+    public void updateQuantity(ItemDto item, String type) {
+
     }
 
     public void clearCart() {
@@ -46,4 +41,6 @@ public class CartDto {
         }
         return total;
     }
+
+
 }

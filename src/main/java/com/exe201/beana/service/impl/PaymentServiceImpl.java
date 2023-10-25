@@ -10,7 +10,9 @@ import com.exe201.beana.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,5 +30,10 @@ public class PaymentServiceImpl implements PaymentService {
                 .status((byte) 1)
                 .build();
         return PaymentMapper.INSTANCE.toPaymentDto(paymentRepository.save(newPayment));
+    }
+
+    @Override
+    public List<PaymentDto> getAllPayments() {
+        return paymentRepository.findAll().stream().map(PaymentMapper.INSTANCE::toPaymentDto).collect(Collectors.toList());
     }
 }
