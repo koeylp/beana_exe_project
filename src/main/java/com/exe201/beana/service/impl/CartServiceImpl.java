@@ -85,7 +85,7 @@ public class CartServiceImpl implements CartService {
         Cookie cartCookie = new Cookie(CART_COOKIE_NAME, serializeCart(cart));
         System.out.println(cartCookie.getValue());
         cartCookie.setMaxAge(24 * 60 * 60 * 1000);
-//        cartCookie.setSecure(true);
+        cartCookie.setSecure(true);
         response.addCookie(cartCookie);
     }
 
