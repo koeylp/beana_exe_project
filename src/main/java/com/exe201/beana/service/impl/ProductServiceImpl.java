@@ -6,7 +6,6 @@ import com.exe201.beana.exception.ResourceAlreadyExistsException;
 import com.exe201.beana.exception.ResourceNotFoundException;
 import com.exe201.beana.mapper.ChildCategoryMapper;
 import com.exe201.beana.mapper.ProductMapper;
-import com.exe201.beana.mapper.SkinMapper;
 import com.exe201.beana.repository.*;
 import com.exe201.beana.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,7 +19,10 @@ import org.springframework.stereotype.Service;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

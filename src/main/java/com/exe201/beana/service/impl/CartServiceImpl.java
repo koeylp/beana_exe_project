@@ -97,6 +97,7 @@ public class CartServiceImpl implements CartService {
                 if (cookie.getName().equals(CART_COOKIE_NAME)) {
                     cookie.setValue(serializedCart);
                     cookie.setMaxAge(24 * 60 * 60); // 1 day
+                    cookie.setHttpOnly(true);
                     response.addCookie(cookie);
                     return;
                 }

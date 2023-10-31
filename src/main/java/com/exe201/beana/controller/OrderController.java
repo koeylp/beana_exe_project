@@ -2,7 +2,6 @@ package com.exe201.beana.controller;
 
 import com.exe201.beana.dto.OrderDto;
 import com.exe201.beana.dto.OrderRequestDto;
-import com.exe201.beana.repository.OrderDetailsRepository;
 import com.exe201.beana.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
