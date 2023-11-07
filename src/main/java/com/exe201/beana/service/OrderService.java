@@ -11,4 +11,6 @@ public interface OrderService {
     OrderDto addOrder(OrderRequestDto orderRequestDto);
 
     List<OrderDto> getOrdersByUser();
+
+    List<OrderDto> getOrdersForAdmin();
 }

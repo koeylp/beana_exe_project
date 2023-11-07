@@ -13,7 +13,14 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.AuthenticationException exception) throws IOException {
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getOutputStream().println("{ \"error\": \"" + exception.getMessage() + "\" }");
-    }
 
+        String errorMessage = "Unauthorized: ";
+        if (exception != null) {
+            errorMessage += exception.getMessage();
+        } else {
+            errorMessage += "Authentication failed due to an unknown reason.";
+        }
+
+        response.getOutputStream().println("{ \"error\": \"" + errorMessage + "\" }");
+    }
 }

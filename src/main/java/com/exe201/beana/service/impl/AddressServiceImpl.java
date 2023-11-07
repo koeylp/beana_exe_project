@@ -61,21 +61,38 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressDto setDefaultAddress(Long addressId) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<User> foundUser = userRepository.findUserByStatusAndUsername((byte) 1, username);
-        if (foundUser.isEmpty())
-            throw new ResourceNotFoundException("User Not found with username: " + username);
 
-        Optional<Address> defaultAddress = addressRepository.findByStatusAndUser((byte) 1, foundUser.get());
+        if (getUserByUsername().isEmpty())
+            throw new ResourceNotFoundException("User Not found!");
+
+        Optional<Address> defaultAddress = addressRepository.findByStatusAndUser((byte) 1, getUserByUsername().get());
         if (defaultAddress.isEmpty())
             throw new ResourceNotFoundException("Default address not found");
         defaultAddress.get().setStatus((byte) 0);
         addressRepository.save(defaultAddress.get());
 
-        Optional<Address> foundAddress = addressRepository.findByIdAndUser(addressId, foundUser.get());
+        Optional<Address> foundAddress = addressRepository.findByIdAndUser(addressId, getUserByUsername().get());
         if (foundAddress.isEmpty())
-            throw new ResourceNotFoundException("Address Not found with id: " + addressId + " for username: " + username);
+            throw new ResourceNotFoundException("Address Not found with id: " + addressId);
         foundAddress.get().setStatus((byte) 1);
         return AddressMapper.INSTANCE.toAddressDto(addressRepository.save(foundAddress.get()));
+    }
+
+    @Override
+    public AddressDto deleteAddressById(Long addressId) {
+        if (getUserByUsername().isEmpty())
+            throw new ResourceNotFoundException("User Not found!");
+
+        Optional<Address> foundAddress = addressRepository.findByIdAndUser(addressId, getUserByUsername().get());
+        if (foundAddress.isEmpty())
+            throw new ResourceNotFoundException("Default address not found");
+
+        foundAddress.get().setStatus((byte) -1);
+        return AddressMapper.INSTANCE.toAddressDto(addressRepository.save(foundAddress.get()));
+    }
+
+    private Optional<User> getUserByUsername() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findUserByStatusAndUsername((byte) 1, username);
     }
 }

@@ -13,4 +13,6 @@ public interface AddressService {
     List<AddressDto> getAddressesByUser();
 
     AddressDto setDefaultAddress(Long addressId);
+
+    AddressDto deleteAddressById(Long addressId);
 }

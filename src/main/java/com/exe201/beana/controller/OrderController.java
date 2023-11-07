@@ -27,4 +27,9 @@ public class OrderController {
     public ResponseEntity<List<OrderDto>> getOrdersByUser() {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrdersByUser());
     }
+
+    @GetMapping("/manager")
+    public ResponseEntity<List<OrderDto>> getOrdersForAdmin() {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrdersForAdmin());
+    }
 }

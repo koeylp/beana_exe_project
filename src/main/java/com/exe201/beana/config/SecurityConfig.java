@@ -89,10 +89,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "api/v1/skins").hasRole(ROLE_MANAGER)
                         .requestMatchers(HttpMethod.GET, "api/v1/skins").permitAll()
                         // child category
-                        .requestMatchers(HttpMethod.POST, "api/v1/childcategories").hasRole(ROLE_MANAGER)
-                        .requestMatchers(HttpMethod.PUT, "api/v1/childcategories").hasRole(ROLE_MANAGER)
-                        .requestMatchers(HttpMethod.DELETE, "api/v1/childcategories").hasRole(ROLE_MANAGER)
-                        .requestMatchers(HttpMethod.GET, "api/v1/childcategories").permitAll()
+                        .requestMatchers(HttpMethod.POST, "api/v1/child-categories").hasRole(ROLE_MANAGER)
+                        .requestMatchers(HttpMethod.PUT, "api/v1/child-categories").hasRole(ROLE_MANAGER)
+                        .requestMatchers(HttpMethod.DELETE, "api/v1/child-categories").hasRole(ROLE_MANAGER)
+                        .requestMatchers(HttpMethod.GET, "api/v1/child-categories").permitAll()
                         // payment
                         .requestMatchers(HttpMethod.POST, "api/v1/payments").hasRole(ROLE_MANAGER)
                         .requestMatchers(HttpMethod.PUT, "api/v1/payments").hasRole(ROLE_MANAGER)
@@ -102,10 +102,11 @@ public class SecurityConfig {
                         // order
                         .requestMatchers(HttpMethod.POST, "api/v1/orders").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
                         .requestMatchers(HttpMethod.GET, "api/v1/orders").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
+                        .requestMatchers(HttpMethod.GET, "api/v1/orders/manager").hasRole(ROLE_MANAGER)
                         // address
                         .requestMatchers(HttpMethod.POST, "api/v1/addresses").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
                         .requestMatchers(HttpMethod.PUT, "api/v1/addresses").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
-                        .requestMatchers(HttpMethod.DELETE, "api/v1/addresses").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
+                        .requestMatchers(HttpMethod.DELETE, "api/v1/addresses/**").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
                         .requestMatchers(HttpMethod.GET, "api/v1/addresses/**").permitAll()
                         // users
                         .requestMatchers("/api/v1/users/**").hasRole(ROLE_MANAGER)

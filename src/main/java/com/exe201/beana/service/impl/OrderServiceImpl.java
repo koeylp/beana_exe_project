@@ -14,9 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -91,6 +89,19 @@ public class OrderServiceImpl implements OrderService {
         Optional<User> foundUser = userRepository.findUserByStatusAndUsername((byte) 1, username);
         if (foundUser.isEmpty())
             throw new ResourceNotFoundException("User Not found with username: " + username);
-        return orderRepository.findAllByStatusAndUser((byte) 1, foundUser.get()).stream().map(OrderMapper.INSTANCE::toOrderDto).collect(Collectors.toList());
+
+        List<OrderDto> orderList = new ArrayList<>(orderRepository.findAllByStatusAndUser((byte) 1, foundUser.get()).stream().map(OrderMapper.INSTANCE::toOrderDto).toList());
+
+        orderList.sort(Comparator.comparing(OrderDto::getOrderDate).reversed());
+
+        return orderList;
+    }
+
+    @Override
+    public List<OrderDto> getOrdersForAdmin() {
+        List<OrderDto> orderList = new ArrayList<>(new ArrayList<>(orderRepository.findAll()).stream().map(OrderMapper.INSTANCE::toOrderDto).toList());
+
+        orderList.sort(Comparator.comparing(OrderDto::getOrderDate).reversed());
+        return orderList;
     }
 }
