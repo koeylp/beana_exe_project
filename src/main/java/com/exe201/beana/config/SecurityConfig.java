@@ -109,7 +109,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "api/v1/addresses/**").hasAnyRole(ROLE_CUSTOMER, ROLE_MANAGER)
                         .requestMatchers(HttpMethod.GET, "api/v1/addresses/**").permitAll()
                         // users
-                        .requestMatchers("/api/v1/users/**").hasRole(ROLE_MANAGER)
+                        .requestMatchers("/api/v1/users").hasRole(ROLE_MANAGER)
+                        .requestMatchers("/api/v1/users/change-avatar").hasRole(ROLE_CUSTOMER)
                 );
 
         http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(authenticationEntryPoint));

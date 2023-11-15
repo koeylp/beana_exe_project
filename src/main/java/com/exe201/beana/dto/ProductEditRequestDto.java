@@ -31,4 +31,6 @@ public class ProductEditRequestDto {
     private Long childCategoryId;
 
     private String howToUse;
+
+    private ProductImageRequestDto[] images;
 }

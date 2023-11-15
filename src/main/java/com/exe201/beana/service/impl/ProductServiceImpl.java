@@ -8,17 +8,11 @@ import com.exe201.beana.mapper.ChildCategoryMapper;
 import com.exe201.beana.mapper.ProductMapper;
 import com.exe201.beana.repository.*;
 import com.exe201.beana.service.ProductService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -36,11 +30,10 @@ public class ProductServiceImpl implements ProductService {
     private final SkinRepository skinRepository;
     private final ProductImageRepository productImageRepository;
     private final CategoryRepository categoryRepository;
-    private static final String IMAGE_COOKIE_NAME = "IMAGE_COOKIE";
 
 
     @Override
-    public ProductDto addProduct(ProductRequestDto productRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ProductDto addProduct(ProductRequestDto productRequest) {
         // check product exits
         Optional<Product> foundProduct = productRepository.findProductByStatusAndName((byte) 1, productRequest.getName());
         if (foundProduct.isPresent())
@@ -55,11 +48,6 @@ public class ProductServiceImpl implements ProductService {
         Optional<Reputation> foundReputation = reputationRepository.findReputationByStatusAndId((byte) 1, productRequest.getReputationId());
         if (foundReputation.isEmpty())
             throw new ResourceNotFoundException("Reputation does not exist with id: " + productRequest.getReputationId());
-
-        // check image list already uploaded
-        ProductImageListDto productImageList = getImageFromCookie(request);
-        if (productImageList.getProductImageList() == null || productImageList.getProductImageList().isEmpty())
-            throw new ResourceNotFoundException("Upload Images first!");
 
         // save product first to get id identity
         Product newProduct = getProduct(productRequest, foundChildCategory, foundReputation);
@@ -83,68 +71,13 @@ public class ProductServiceImpl implements ProductService {
         }
         newProduct.setProductSkins(productSkinList);
 
-        // get image uploaded from cookie and save to database
-        newProduct.setProductImageList(productImageList.getProductImageList());
-
-        for (ProductImage productImage : productImageList.getProductImageList()) {
-            productImage.setProduct(newProduct);
-            productImageRepository.save(productImage);
+        // images
+        for (ProductImageRequestDto image : productRequest.getImages()) {
+            ProductImage newImage = new ProductImage(null, image.getUrl(), (byte) 1, newProduct, image.getType());
+            productImageRepository.save(newImage);
         }
-
-        // clear images after done saving
-        productImageList.getProductImageList().clear();
-        saveImageToCookie(productImageList, response);
 
         return ProductMapper.INSTANCE.toProductDto(productRepository.save(newProduct));
-    }
-
-    private ProductImageListDto getImageFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(IMAGE_COOKIE_NAME)) {
-                    return deserializeImages(cookie.getValue());
-                }
-            }
-        }
-        return new ProductImageListDto();
-    }
-
-    private ProductImageListDto deserializeImages(String imageJson) {
-        try {
-            String decodedImageData = URLDecoder.decode(imageJson, StandardCharsets.UTF_8);
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(decodedImageData, ProductImageListDto.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void saveImageToCookie(ProductImageListDto imageUrls, HttpServletResponse response) {
-        Cookie imageCookie = new Cookie(IMAGE_COOKIE_NAME, serializeImageList(imageUrls));
-        imageCookie.setMaxAge(10 * 60);
-        response.addCookie(imageCookie);
-    }
-
-    private void clearCookie(ProductImageListDto imageUrls, HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(IMAGE_COOKIE_NAME)) {
-                    cookie.setValue(serializeImageList(imageUrls));
-                    response.addCookie(cookie);
-                }
-            }
-        }
-    }
-
-    private String serializeImageList(ProductImageListDto imageUrls) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return URLEncoder.encode(objectMapper.writeValueAsString(imageUrls), StandardCharsets.UTF_8);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static Product getProduct(ProductRequestDto productRequest, Optional<ChildCategory> foundChildCategory, Optional<Reputation> foundReputation) {
@@ -181,7 +114,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto editProduct(ProductEditRequestDto productRequest, Long productId, HttpServletRequest request, HttpServletResponse response) {
+    public ProductDto editProduct(ProductEditRequestDto productRequest, Long productId) {
 
         // check the existence of product
         Optional<Product> foundProduct = productRepository.findById(productId);
@@ -229,23 +162,9 @@ public class ProductServiceImpl implements ProductService {
         if (productRequest.getSpecification() != null)
             foundProduct.get().setSpecification(productRequest.getSpecification());
 
-        // check image list already uploaded
-        ProductImageListDto productImageList = getImageFromCookie(request);
+//        if (productRequest.getImages() != null)
+//            foundProduct.get().setProductImageList(productRequest.getImages());
 
-        if (!productImageList.getProductImageList().isEmpty()) {
-            for (ProductImage productImage : productImageList.getProductImageList()) {
-                productImage.setProduct(foundProduct.get());
-                productImageRepository.save(productImage);
-            }
-
-            productImageList.getProductImageList().addAll(foundProduct.get().getProductImageList());
-            // get image uploaded from cookie and save to database
-            foundProduct.get().setProductImageList(productImageList.getProductImageList());
-
-            // clear images after done saving
-            productImageList.getProductImageList().clear();
-            saveImageToCookie(productImageList, response);
-        }
 
         return ProductMapper.INSTANCE.toProductDto(productRepository.save(foundProduct.get()));
     }

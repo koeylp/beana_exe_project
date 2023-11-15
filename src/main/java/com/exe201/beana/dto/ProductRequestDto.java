@@ -43,7 +43,7 @@ public class ProductRequestDto {
     @NotNull(message = "childCategoryId not found")
     private Long childCategoryId;
 
-    private Long[] productImageIds;
+    private ProductImageRequestDto[] images;
 
     private String howToUse;
 }

@@ -1,13 +1,11 @@
 package com.exe201.beana.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Date;
@@ -44,6 +42,7 @@ public class RegisterRequestDto {
 
     @NotEmpty(message = "Password is required")
     @NotBlank(message = "The property is not null or whitespace")
+    @Pattern(regexp = "(?=.*[0-9])(?=.*[@#$%^&+=]).{8,}", message = "Minimum eight characters, at least one letter and one number")
     private String password;
 
     @Value("false")

@@ -22,8 +22,8 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("")
-    public ResponseEntity<ProductDto> addProduct(@RequestBody @Valid ProductRequestDto productRequest, HttpServletRequest request, HttpServletResponse response) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.addProduct(productRequest, request, response));
+    public ResponseEntity<ProductDto> addProduct(@RequestBody @Valid ProductRequestDto productRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.addProduct(productRequest));
     }
 
     @GetMapping("")
@@ -42,9 +42,8 @@ public class ProductController {
     }
 
     @PutMapping("{productId}")
-    public ResponseEntity<ProductDto> editProduct(@RequestBody @Valid ProductEditRequestDto productRequest, @PathVariable Long productId,
-                                                  HttpServletRequest request, HttpServletResponse response) {
-        return ResponseEntity.status(HttpStatus.OK).body(productService.editProduct(productRequest, productId, request, response));
+    public ResponseEntity<ProductDto> editProduct(@RequestBody @Valid ProductEditRequestDto productRequest, @PathVariable Long productId) {
+        return ResponseEntity.status(HttpStatus.OK).body(productService.editProduct(productRequest, productId));
     }
 
     @GetMapping("/filter")

@@ -1,13 +1,13 @@
 package com.exe201.beana.controller;
 
 
+import com.exe201.beana.dto.ChangeAvatarRequestDto;
 import com.exe201.beana.dto.UserDto;
 import com.exe201.beana.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,5 +21,10 @@ public class UserController {
     @GetMapping("")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @PostMapping("/change-avatar")
+    public ResponseEntity<String> changeAvatarUser(@RequestBody @Valid ChangeAvatarRequestDto avatar) {
+        return ResponseEntity.ok(userService.changeAvatarUser(avatar));
     }
 }
