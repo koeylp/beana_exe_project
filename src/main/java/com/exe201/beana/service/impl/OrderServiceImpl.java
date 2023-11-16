@@ -37,7 +37,7 @@ public class OrderServiceImpl implements OrderService {
 
         Optional<Address> foundAddress = addressRepository.findAddressByStatusAndId((byte) 1, orderRequestDto.getAddressId());
         if (foundAddress.isEmpty())
-            throw new ResourceNotFoundException("Address not found with Id: " + orderRequestDto.getAddressId());
+            throw new ResourceNotFoundException(orderRequestDto.getAddressId() + "is not default address!");
 
         Optional<Payment> foundPayment = paymentRepository.findPaymentByStatusAndId((byte) 1, orderRequestDto.getPaymentId());
         if (foundPayment.isEmpty())
