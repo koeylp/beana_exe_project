@@ -85,7 +85,7 @@ public class AddressServiceImpl implements AddressService {
 
         Optional<Address> foundAddress = addressRepository.findByIdAndUser(addressId, getUserByUsername().get());
         if (foundAddress.isEmpty())
-            throw new ResourceNotFoundException("Default address not found");
+            throw new ResourceNotFoundException("Address not found");
 
         foundAddress.get().setStatus((byte) -1);
         return AddressMapper.INSTANCE.toAddressDto(addressRepository.save(foundAddress.get()));
