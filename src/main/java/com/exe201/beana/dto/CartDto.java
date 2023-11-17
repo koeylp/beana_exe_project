@@ -38,7 +38,6 @@ public class CartDto {
                 if (currentQuantity > 1) {
                     cartItem.setQuantity(currentQuantity - 1);
                 } else {
-                    // Optionally, you can remove the item if the quantity is 1 or less
                     removeItem(item);
                 }
             }

@@ -14,4 +14,6 @@ public interface OrderService {
     List<OrderDto> getOrdersByUser();
 
     List<OrderDto> getOrdersForAdmin();
+
+    OrderDto updateStatus(Long orderId, byte newStatus);
 }

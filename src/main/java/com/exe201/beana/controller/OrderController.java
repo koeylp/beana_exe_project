@@ -34,4 +34,9 @@ public class OrderController {
     public ResponseEntity<List<OrderDto>> getOrdersForAdmin() {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrdersForAdmin());
     }
+
+    @PutMapping("update-status/{orderId}/{newStatus}")
+    public ResponseEntity<OrderDto> updateStatus(@PathVariable Long orderId, @PathVariable byte newStatus) {
+        return ResponseEntity.ok(orderService.updateStatus(orderId, newStatus));
+    }
 }

@@ -170,5 +170,15 @@ public class OrderServiceImpl implements OrderService {
         return orderList;
     }
 
+    @Override
+    public OrderDto updateStatus(Long orderId, byte newStatus) {
+        Optional<Order> foundOrder = orderRepository.findById(orderId);
+        if (foundOrder.isEmpty())
+            throw new ResourceNotFoundException("Order Not found with username: " + orderId);
+
+        foundOrder.get().setStatus(newStatus);
+        return OrderMapper.INSTANCE.toOrderDto(orderRepository.save(foundOrder.get()));
+    }
+
 
 }
