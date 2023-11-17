@@ -27,4 +27,9 @@ public class UserController {
     public ResponseEntity<String> changeAvatarUser(@RequestBody @Valid ChangeAvatarRequestDto avatar) {
         return ResponseEntity.ok(userService.changeAvatarUser(avatar));
     }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserDto> getProfile() {
+        return ResponseEntity.ok(userService.getProfile());
+    }
 }

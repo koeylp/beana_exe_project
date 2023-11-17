@@ -1,5 +1,6 @@
 package com.exe201.beana.service.impl;
 
+import com.exe201.beana.dto.CartDto;
 import com.exe201.beana.dto.OrderDetailsDto;
 import com.exe201.beana.dto.OrderDto;
 import com.exe201.beana.dto.OrderRequestDto;
@@ -10,12 +11,22 @@ import com.exe201.beana.mapper.OrderMapper;
 import com.exe201.beana.mapper.ProductMapper;
 import com.exe201.beana.repository.*;
 import com.exe201.beana.service.OrderService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +39,10 @@ public class OrderServiceImpl implements OrderService {
     private final AddressRepository addressRepository;
     private final PaymentRepository paymentRepository;
 
+    private final static String CART_COOKIE_NAME = "CART_COOKIE";
+
     @Override
-    public OrderDto addOrder(OrderRequestDto orderRequestDto) {
+    public OrderDto addOrder(OrderRequestDto orderRequestDto, HttpServletRequest request, HttpServletResponse response) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> foundUser = userRepository.findUserByStatusAndUsername((byte) 1, username);
         if (foundUser.isEmpty())
@@ -80,7 +93,60 @@ public class OrderServiceImpl implements OrderService {
             orderDetailsRepository.save(newOrderDetails);
         }
         tempOrder.setOrderDetailsList(orderDetailsRepository.getOrderDetailsByStatusAndOrder((byte) 1, tempOrder));
+
+        CartDto cartDto = getCartFromCookie(request);
+        if (cartDto.getItems() != null)
+            cartDto.clearCart();
+        saveCartToCookie(cartDto, request, response);
+
         return OrderMapper.INSTANCE.toOrderDto(orderRepository.save(tempOrder));
+    }
+
+    private void saveCartToCookie(CartDto cart, HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(CART_COOKIE_NAME)) {
+                    cookie.setValue(serializeCart(cart));
+                    cookie.setMaxAge(1);
+                    cookie.setSecure(true);
+                    response.addCookie(cookie);
+                }
+            }
+        }
+
+    }
+
+    private String serializeCart(CartDto cart) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String cartJson = objectMapper.writeValueAsString(cart);
+            return URLEncoder.encode(cartJson, StandardCharsets.UTF_8);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private CartDto getCartFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(CART_COOKIE_NAME)) {
+                    return deserializeCart(cookie.getValue());
+                }
+            }
+        }
+        return new CartDto();
+    }
+
+    private CartDto deserializeCart(String cartJson) {
+        try {
+            String decodedCartData = URLDecoder.decode(cartJson, StandardCharsets.UTF_8);
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(decodedCartData, CartDto.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -90,7 +156,7 @@ public class OrderServiceImpl implements OrderService {
         if (foundUser.isEmpty())
             throw new ResourceNotFoundException("User Not found with username: " + username);
 
-        List<OrderDto> orderList = new ArrayList<>(orderRepository.findAllByStatusAndUser((byte) 1, foundUser.get()).stream().map(OrderMapper.INSTANCE::toOrderDto).toList());
+        List<OrderDto> orderList = new ArrayList<>(orderRepository.findAllByUser(foundUser.get()).stream().map(OrderMapper.INSTANCE::toOrderDto).toList());
 
         orderList.sort(Comparator.comparing(OrderDto::getOrderDate).reversed());
 
@@ -100,8 +166,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDto> getOrdersForAdmin() {
         List<OrderDto> orderList = new ArrayList<>(new ArrayList<>(orderRepository.findAll()).stream().map(OrderMapper.INSTANCE::toOrderDto).toList());
-
         orderList.sort(Comparator.comparing(OrderDto::getOrderDate).reversed());
         return orderList;
     }
+
+
 }

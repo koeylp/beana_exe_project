@@ -1,5 +1,6 @@
 package com.exe201.beana.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -51,5 +52,6 @@ public class AddressDto {
     private byte status;
 
     @NotNull(message = "user is required")
+    @JsonIgnore
     private UserDto user;
 }

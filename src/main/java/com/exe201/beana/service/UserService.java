@@ -9,4 +9,6 @@ public interface UserService {
     List<UserDto> getAllUsers();
 
     String changeAvatarUser(ChangeAvatarRequestDto avatar);
+
+    UserDto getProfile();
 }

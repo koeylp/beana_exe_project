@@ -12,11 +12,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Objects;
 
 @Service
@@ -57,14 +55,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public void updateQuantity(ItemDto item, String type, HttpServletRequest request, HttpServletResponse response) {
         CartDto cart = getCart(request);
-        for (CartItemDto cartItemDto : cart.getItems()) {
-            if (Objects.equals(cartItemDto.getItem().getId(), item.getId())) {
-                if (type.equalsIgnoreCase("minus"))
-                    cartItemDto.setQuantity(cartItemDto.getQuantity() - 1);
-                else if (type.equalsIgnoreCase("plus"))
-                    cartItemDto.setQuantity(cartItemDto.getQuantity() - 1);
-            }
-        }
+        cart.updateQuantity(item, type);
         saveCartToCookie(cart, request, response);
     }
 
@@ -83,7 +74,6 @@ public class CartServiceImpl implements CartService {
 
     private void saveCartToCookie(CartDto cart, HttpServletResponse response) {
         Cookie cartCookie = new Cookie(CART_COOKIE_NAME, serializeCart(cart));
-        System.out.println(cartCookie.getValue());
         cartCookie.setMaxAge(24 * 60 * 60 * 1000);
         cartCookie.setSecure(true);
         response.addCookie(cartCookie);
@@ -103,21 +93,12 @@ public class CartServiceImpl implements CartService {
                 }
             }
         }
-        // If the "shoppingCart" cookie doesn't exist, create a new one
-        Cookie cartCookie = new Cookie("shoppingCart", serializedCart);
-        cartCookie.setMaxAge(24 * 60 * 60); // 1 day
-        response.addCookie(cartCookie);
+//        // If the "shoppingCart" cookie doesn't exist, create a new one
+//        Cookie cartCookie = new Cookie("shoppingCart", serializedCart);
+//        cartCookie.setMaxAge(24 * 60 * 60); // 1 day
+//        response.addCookie(cartCookie);
     }
 
-    //    private String serializeCart(CartDto cart) {
-//        try {
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            return URLEncoder.encode(objectMapper.writeValueAsString(cart), StandardCharsets.UTF_8);
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//
     private CartDto deserializeCart(String cartJson) {
         try {
             String decodedCartData = URLDecoder.decode(cartJson, StandardCharsets.UTF_8);

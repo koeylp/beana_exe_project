@@ -27,7 +27,29 @@ public class CartDto {
     }
 
     public void updateQuantity(ItemDto item, String type) {
+        CartItemDto cartItem = findCartItem(item);
 
+        if (cartItem != null) {
+            int currentQuantity = cartItem.getQuantity();
+
+            if ("increase".equalsIgnoreCase(type)) {
+                cartItem.setQuantity(currentQuantity + 1);
+            } else if ("decrease".equalsIgnoreCase(type)) {
+                if (currentQuantity > 1) {
+                    cartItem.setQuantity(currentQuantity - 1);
+                } else {
+                    // Optionally, you can remove the item if the quantity is 1 or less
+                    removeItem(item);
+                }
+            }
+        }
+    }
+
+    private CartItemDto findCartItem(ItemDto item) {
+        return items.stream()
+                .filter(cartItem -> Objects.equals(cartItem.getItem().getId(), item.getId()))
+                .findFirst()
+                .orElse(null);
     }
 
     public void clearCart() {

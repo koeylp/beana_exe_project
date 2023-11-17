@@ -3,6 +3,8 @@ package com.exe201.beana.controller;
 import com.exe201.beana.dto.OrderDto;
 import com.exe201.beana.dto.OrderRequestDto;
 import com.exe201.beana.service.OrderService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,8 +21,8 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("")
-    public ResponseEntity<OrderDto> addOrder(@RequestBody @Valid OrderRequestDto orderRequestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.addOrder(orderRequestDto));
+    public ResponseEntity<OrderDto> addOrder(@RequestBody @Valid OrderRequestDto orderRequestDto, HttpServletRequest request, HttpServletResponse response) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.addOrder(orderRequestDto, request, response));
     }
 
     @GetMapping("")

@@ -110,6 +110,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "api/v1/addresses/**").permitAll()
                         // users
                         .requestMatchers("/api/v1/users").hasRole(ROLE_MANAGER)
+                        .requestMatchers("/api/v1/users/profile").hasRole(ROLE_CUSTOMER)
                         .requestMatchers("/api/v1/users/change-avatar").hasRole(ROLE_CUSTOMER)
                 );
 

@@ -36,4 +36,13 @@ public class UserServiceImpl implements UserService {
         userRepository.save(foundUser.get());
         return "Avatar was changed successfully!";
     }
+
+    @Override
+    public UserDto getProfile() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<User> foundUser = userRepository.findUserByStatusAndUsername((byte) 1, username);
+        if (foundUser.isEmpty())
+            throw new ResourceNotFoundException("User Not found with username: " + username);
+        return UserMapper.INSTANCE.toUserDto(foundUser.get());
+    }
 }
