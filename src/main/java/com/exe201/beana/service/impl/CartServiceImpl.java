@@ -82,30 +82,6 @@ public class CartServiceImpl implements CartService {
         response.addCookie(cartCookie);
     }
 
-//    public void saveCartToCookie(CartDto cart, HttpServletRequest request, HttpServletResponse response) {
-//        Cookie[] cookies = request.getCookies();
-//
-//        // Check if the cart cookie already exists
-//        if (cookies != null) {
-//            for (Cookie cookie : cookies) {
-//                if (cookie.getName().equals(CART_COOKIE_NAME)) {
-//                    // Create a new cookie with the updated value
-//                    Cookie updatedCookie = new Cookie(CART_COOKIE_NAME, serializeCart(cart));
-//                    updatedCookie.setMaxAge(24 * 60 * 60 * 1000);
-//                    updatedCookie.setSecure(true);
-//                    response.addCookie(updatedCookie);
-//                    return; // Exit the method after updating the existing cookie
-//                }
-//            }
-//        }
-//
-//        // If the cart cookie doesn't exist, create a new one
-//        Cookie cartCookie = new Cookie(CART_COOKIE_NAME, serializeCart(cart));
-//        cartCookie.setMaxAge(24 * 60 * 60 * 1000);
-//        cartCookie.setSecure(true);
-//        response.addCookie(cartCookie);
-//    }
-
     private void saveCartToCookie(CartDto cart, HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
 

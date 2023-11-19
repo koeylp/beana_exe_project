@@ -11,6 +11,7 @@ import com.exe201.beana.mapper.OrderMapper;
 import com.exe201.beana.mapper.ProductMapper;
 import com.exe201.beana.repository.*;
 import com.exe201.beana.service.OrderService;
+import com.exe201.beana.util.RandomCodeGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -56,7 +57,8 @@ public class OrderServiceImpl implements OrderService {
         if (foundPayment.isEmpty())
             throw new ResourceNotFoundException("Payment not found with id: " + orderRequestDto.getPaymentId());
 
-        Order newOrder = new Order(null, null, orderRequestDto.getAmount(), (byte) 1, foundUser.get(), foundAddress.get(), foundPayment.get(), null);
+        String orderCode = RandomCodeGenerator.generateOrderCode();
+        Order newOrder = new Order(null, null, orderRequestDto.getAmount(), (byte) 1, foundUser.get(), foundAddress.get(), foundPayment.get(), null, orderCode);
         Order tempOrder = new Order();
 
         List<OrderDetailsDto> tempOrderDetailsList = new ArrayList<>();
@@ -94,27 +96,39 @@ public class OrderServiceImpl implements OrderService {
         }
         tempOrder.setOrderDetailsList(orderDetailsRepository.getOrderDetailsByStatusAndOrder((byte) 1, tempOrder));
 
-        CartDto cartDto = getCartFromCookie(request);
-        if (cartDto.getItems() != null)
-            cartDto.clearCart();
-        saveCartToCookie(cartDto, request, response);
+
+        CartDto cart = getCartFromCookie(request);
+        saveCartToCookie(cart, request, response);
+//        tempOrder.setCode(orderCode);
 
         return OrderMapper.INSTANCE.toOrderDto(orderRepository.save(tempOrder));
     }
 
     private void saveCartToCookie(CartDto cart, HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
+        boolean cartCookieFound = false;
+
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(CART_COOKIE_NAME)) {
+                    // Update the existing cart cookie
                     cookie.setValue(serializeCart(cart));
                     cookie.setMaxAge(1);
                     cookie.setSecure(true);
                     response.addCookie(cookie);
+                    cartCookieFound = true;
+                    break;
                 }
             }
         }
 
+        // If no existing cart cookie found, create a new one
+        if (!cartCookieFound) {
+            Cookie newCookie = new Cookie(CART_COOKIE_NAME, serializeCart(cart));
+            newCookie.setMaxAge(1);
+            newCookie.setSecure(true);
+            response.addCookie(newCookie);
+        }
     }
 
     private String serializeCart(CartDto cart) {
@@ -125,6 +139,13 @@ public class OrderServiceImpl implements OrderService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void saveCartToCookie(CartDto cart, HttpServletResponse response) {
+        Cookie cookie = new Cookie(CART_COOKIE_NAME, null);
+        cookie.setMaxAge(24 * 60 * 60 * 1000);
+        cookie.setSecure(true);
+        response.addCookie(cookie);
     }
 
     private CartDto getCartFromCookie(HttpServletRequest request) {

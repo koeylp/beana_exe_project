@@ -49,4 +49,7 @@ public class Order {
     @JsonIgnore
     private List<OrderDetails> orderDetailsList;
 
+    @Column(unique = true)
+    private String code;
+
 }

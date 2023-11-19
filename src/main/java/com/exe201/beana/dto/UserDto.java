@@ -1,5 +1,6 @@
 package com.exe201.beana.dto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,10 +20,12 @@ public class UserDto {
     @NotEmpty(message = "Email is required")
     @Email(message = "Wrong email's format")
     @NotBlank(message = "The property is not null or whitespace")
+    @Column(unique = true)
     private String email;
 
     @NotEmpty(message = "Username is required")
     @NotBlank(message = "The property is not null or whitespace")
+    @Column(unique = true)
     private String username;
 
     @NotEmpty(message = "Name is required")
@@ -32,6 +35,7 @@ public class UserDto {
     @Pattern(regexp = "(^$|[0-9]{10})", message = "Phone must be only number and including 10 numbers")
     @NotEmpty(message = "Phone is required")
     @NotBlank(message = "The property is not null or whitespace")
+    @Column(unique = true)
     private String phone;
 
     private int gender;
