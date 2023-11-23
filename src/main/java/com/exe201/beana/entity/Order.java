@@ -42,12 +42,13 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "paymentId")
-    @JsonIgnore
     private Payment payment;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
-    @JsonIgnore
     private List<OrderDetails> orderDetailsList;
+
+    @Column(columnDefinition = "int default '0'")
+    private int faceScanning;
 
     @Column(unique = true)
     private String code;

@@ -34,6 +34,8 @@ public class OrderDto {
 
     private List<OrderDetailsDto> orderDetailsList;
 
+    private int faceScanning;
+
     private String code;
 
 }

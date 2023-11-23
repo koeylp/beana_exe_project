@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -57,44 +54,44 @@ public class OrderServiceImpl implements OrderService {
         if (foundPayment.isEmpty())
             throw new ResourceNotFoundException("Payment not found with id: " + orderRequestDto.getPaymentId());
 
+
         String orderCode = RandomCodeGenerator.generateOrderCode();
-        Order newOrder = new Order(null, null, orderRequestDto.getAmount(), (byte) 1, foundUser.get(), foundAddress.get(), foundPayment.get(), null, orderCode);
-        Order tempOrder = new Order();
+        Order newOrder = new Order(null, null, orderRequestDto.getAmount(), (byte) 1, foundUser.get(), foundAddress.get(), foundPayment.get(), null, orderRequestDto.getFaceScanning(), orderCode);
+        Order tempOrder = orderRepository.save(newOrder);
+        if (orderRequestDto.getOrderDetailsList() != null) {
+            List<OrderDetailsDto> tempOrderDetailsList = new ArrayList<>();
+            for (int i = 0; i < orderRequestDto.getOrderDetailsList().size(); i++) {
+                Long currentProductId = orderRequestDto.getOrderDetailsList().get(i).getProductId();
+                Optional<Product> foundProduct = productRepository.findProductByStatusAndId((byte) 1, currentProductId);
+                if (foundProduct.isEmpty())
+                    throw new ResourceNotFoundException("Product not found with id: " + currentProductId);
 
-        List<OrderDetailsDto> tempOrderDetailsList = new ArrayList<>();
-        for (int i = 0; i < orderRequestDto.getOrderDetailsList().size(); i++) {
-            Long currentProductId = orderRequestDto.getOrderDetailsList().get(i).getProductId();
-            Optional<Product> foundProduct = productRepository.findProductByStatusAndId((byte) 1, currentProductId);
-            if (foundProduct.isEmpty())
-                throw new ResourceNotFoundException("Product not found with id: " + currentProductId);
+                // check quantity
+                if (foundProduct.get().getQuantity() - orderRequestDto.getOrderDetailsList().get(i).getQuantity() < 0)
+                    throw new AccessDeniedException("The quantity of product with id " + orderRequestDto.getOrderDetailsList().get(i).getProductId()
+                            + "must less than or equal to " + foundProduct.get().getQuantity());
 
-            // check quantity
-            if (foundProduct.get().getQuantity() - orderRequestDto.getOrderDetailsList().get(i).getQuantity() < 0)
-                throw new AccessDeniedException("The quantity of product with id " + orderRequestDto.getOrderDetailsList().get(i).getProductId()
-                        + "must less than or equal to " + foundProduct.get().getQuantity());
+                // edit quantity when the condition of quantity is checked well
+                foundProduct.get().setSoldQuantity(foundProduct.get().getSoldQuantity() + orderRequestDto.getOrderDetailsList().get(i).getQuantity());
+                foundProduct.get().setQuantity(foundProduct.get().getQuantity() - orderRequestDto.getOrderDetailsList().get(i).getQuantity());
 
-            // edit quantity when the condition of quantity is checked well
-            foundProduct.get().setSoldQuantity(foundProduct.get().getSoldQuantity() + orderRequestDto.getOrderDetailsList().get(i).getQuantity());
-            foundProduct.get().setQuantity(foundProduct.get().getQuantity() - orderRequestDto.getOrderDetailsList().get(i).getQuantity());
+                // if out of stock set status to 0
+                if (foundProduct.get().getQuantity() == 0)
+                    foundProduct.get().setStatus((byte) 0);
 
-            // if out of stock set status to 0
-            if (foundProduct.get().getQuantity() == 0)
-                foundProduct.get().setStatus((byte) 0);
+                tempOrderDetailsList.add(new OrderDetailsDto(null, orderRequestDto.getOrderDetailsList().get(i).getQuantity(), null, (byte) 1, OrderMapper.INSTANCE.toOrderDto(tempOrder), ProductMapper.INSTANCE.toProductDto(foundProduct.get())));
+            }
 
-            tempOrder = orderRepository.save(newOrder);
-
-            tempOrderDetailsList.add(new OrderDetailsDto(null, orderRequestDto.getOrderDetailsList().get(i).getQuantity(), null, (byte) 1, OrderMapper.INSTANCE.toOrderDto(tempOrder), ProductMapper.INSTANCE.toProductDto(foundProduct.get())));
+            for (OrderDetailsDto orderDetailsDto : tempOrderDetailsList) {
+                OrderDetails newOrderDetails = new OrderDetails();
+                newOrderDetails.setQuantity(orderDetailsDto.getQuantity());
+                newOrderDetails.setOrder(OrderMapper.INSTANCE.toOrder(orderDetailsDto.getOrderDto()));
+                newOrderDetails.setStatus((byte) 1);
+                newOrderDetails.setProduct(ProductMapper.INSTANCE.toProduct(orderDetailsDto.getProduct()));
+                orderDetailsRepository.save(newOrderDetails);
+            }
+            tempOrder.setOrderDetailsList(orderDetailsRepository.getOrderDetailsByStatusAndOrder((byte) 1, tempOrder));
         }
-
-        for (OrderDetailsDto orderDetailsDto : tempOrderDetailsList) {
-            OrderDetails newOrderDetails = new OrderDetails();
-            newOrderDetails.setQuantity(orderDetailsDto.getQuantity());
-            newOrderDetails.setOrder(OrderMapper.INSTANCE.toOrder(orderDetailsDto.getOrderDto()));
-            newOrderDetails.setStatus((byte) 1);
-            newOrderDetails.setProduct(ProductMapper.INSTANCE.toProduct(orderDetailsDto.getProduct()));
-            orderDetailsRepository.save(newOrderDetails);
-        }
-        tempOrder.setOrderDetailsList(orderDetailsRepository.getOrderDetailsByStatusAndOrder((byte) 1, tempOrder));
 
 
         CartDto cart = getCartFromCookie(request);

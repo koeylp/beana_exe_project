@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 
@@ -33,11 +32,9 @@ public class OrderDetails {
 
     @ManyToOne
     @JoinColumn(name = "orderId")
-    @JsonIgnore
     private Order order;
 
     @ManyToOne
     @JoinColumn(name = "productId")
-    @JsonIgnore
     private Product product;
 }

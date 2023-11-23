@@ -23,6 +23,7 @@ public class OrderRequestDto {
     @NotNull(message = "PaymentId is required")
     private Long paymentId;
 
-    @NotNull(message = "orderItemIds is required")
     private List<OrderDetailsRequestDto> orderDetailsList;
+
+    private int faceScanning;
 }
