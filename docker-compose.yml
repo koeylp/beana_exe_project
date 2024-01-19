@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  app:
+    build: ./
+    env_file: ./.env
+    ports:
+      - 8686:8686
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:mysql://27.74.255.96:3336/pintoway?sessionVariables=sql_mode=NO_ENGINE_SUBSTITUTION&jdbcCompliantTruncation=false",
+        "spring.datasource.username" : "pintoway",
+        "spring.datasource.password" : "0Ew88",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQLDialect",
+        "spring.jpa.hibernate.ddl-auto" : "update"
+      }'
+    stdin_open: true
+    tty: true
+
